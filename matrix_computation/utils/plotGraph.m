@@ -1,4 +1,4 @@
-function plotLaplacian(E)
+function plotGraph(E)
 
     G = graph(E(:,1), E(:,2));
     
