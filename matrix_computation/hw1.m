@@ -4,7 +4,7 @@ addpath(genpath('utils'));
 E = load('data/zachary.txt');
 A = getLaplacian(E);
 
-eps = 1e-3;
+eps = 1e-5;
 err = Inf;
 
 n = size(A, 1);
@@ -15,7 +15,7 @@ while err > eps
     v = A*u;
     lambda2 = norm(v,2);
     u = v/lambda2;
-    err = abs(lambda1-lambda2);
+    err = abs(lambda1-lambda2); % criterion
     lambda1 = lambda2;
 end
 
