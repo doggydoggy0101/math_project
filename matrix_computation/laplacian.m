@@ -5,4 +5,4 @@ E = load('data/zachary.txt');
 
 mtx_L = getLaplacian(E);
 
-plotLaplacian(E)
+plotGraph(E)
