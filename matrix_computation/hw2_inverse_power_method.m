@@ -1,7 +1,7 @@
 clc;clear; 
 addpath(genpath('utils'));
 
-E = load('data/zachary.txt'); % dim=58228
+E = load('data/zachary.txt'); 
 A = getLaplacian(E);
 
 eps = 1e-5;
