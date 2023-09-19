@@ -17,7 +17,7 @@ fprintf("norm(Ax-λx): %f \n", check);
 
 % Newton's Inverse Iteration
 fprintf("NII:\n")
-[eigval, eigvec, sigma] = inverse_power_method_RQI(A, eps, iter, sigma, verbose);
+[eigval, eigvec, sigma] = inverse_power_method_NII(A, eps, iter, sigma, verbose);
 check = norm(A*eigvec - eigval*eigvec, 2);
 fprintf("norm(Ax-λx): %f \n", check);
 
