@@ -9,7 +9,6 @@ function mtx_L = getLaplacian(E)
         mtx_L = sparse(E(:,1), E(:,2), E(:,3), n, n);
     end
     
-    
     D_L = diag(mtx_L);
     
     if ( ~isempty(find(D_L ~= 0, 1)) )
