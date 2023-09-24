@@ -1,8 +1,8 @@
 clc;clear; 
 addpath(genpath('utils'));
 
-E = load('data/zachary.txt'); 
-A = getLaplacian(E);
+E = load('data/brightkite.txt'); 
+A = getLaplacian(E, true);
 
 eps = 1e-8;
 iter = 1e+5;

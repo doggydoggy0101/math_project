@@ -1,4 +1,4 @@
-function mtx_L = getLaplacian(E)
+function mtx_L = getLaplacian(E, verbose)
 
     n = max(max(E));
     m = size(E,2);
@@ -18,5 +18,8 @@ function mtx_L = getLaplacian(E)
     mtx_L = mtx_L + mtx_L';
     mtx_L = diag(sum(mtx_L, 2)) - mtx_L; % Laplacian matrix
 
+    if verbose
+        fprintf("dimension: %.0f \n", n);
+    end
 end
 

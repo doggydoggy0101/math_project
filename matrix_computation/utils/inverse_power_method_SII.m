@@ -18,8 +18,8 @@ function [eigval, eigvec] = inverse_power_method_SII(matrix, epsilon, iter_max, 
         lambda2 = norm(v,2);
         u = v/lambda2;
 
+        lambda1 = sigma + 1/lambda2;
         err = abs(lambda1-lambda2); % criterion
-        lambda1 = lambda2;
         iter = iter + 1;
     end
 
@@ -27,11 +27,11 @@ function [eigval, eigvec] = inverse_power_method_SII(matrix, epsilon, iter_max, 
         toc
     end
     
-    eigval = lambda1^-1 + sigma;
+    eigval = lambda1;
     eigvec = u;
 
     if verbose
-        fprintf("eigenvalue closest to %.0f: %f \n",sigma, eigval);
+        fprintf("eigenvalue closest to %.2f: %f \n",sigma, eigval);
     end
 end
 

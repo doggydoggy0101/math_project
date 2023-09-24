@@ -6,21 +6,20 @@ function [eigval, eigvec, sigma] = inverse_power_method_RQI(matrix, epsilon, ite
     
     n = size(matrix, 1);
     u = [1,zeros(1,n-1)].'; % n x 1 column vector
-    lambda1 = norm(u,2); % where the 2-norm is 1
+    lambda1 = sigma; 
     
     if verbose
         tic
     end
 
     while (err > eps && iter < iter_max)
-        matrix_ = matrix - sigma*speye(n);
+        matrix_ = matrix - lambda1*speye(n);
         v = matrix_\u;
         lambda2 = norm(v,2);
         u = v/lambda2;
-        sigma = dot(matrix*u,u);
+        lambda1 = dot(matrix*u,u);
 
         err = abs(lambda1-lambda2); % criterion
-        lambda1 = lambda2;
         iter = iter + 1;
     end
 
@@ -28,7 +27,7 @@ function [eigval, eigvec, sigma] = inverse_power_method_RQI(matrix, epsilon, ite
         toc
     end
     
-    eigval = lambda1^-1 + sigma;
+    eigval = lambda1;
     eigvec = u;
 
     if verbose

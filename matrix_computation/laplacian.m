@@ -1,8 +1,7 @@
 clc;clear; 
 addpath(genpath('utils'));
 
-E = load('data/zachary.txt'); 
+E = load('data/brightkite.txt'); 
+mtx_L = getLaplacian(E, true);
 
-mtx_L = getLaplacian(E);
-
-plotGraph(E)
+% plotGraph(E)
