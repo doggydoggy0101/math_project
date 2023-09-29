@@ -4,22 +4,26 @@ function [eigval, eigvec, sigma] = inverse_power_method_RQI(matrix, epsilon, ite
     err = Inf;
     iter = 0;
     
-    n = size(matrix, 1);
-    u = [1,zeros(1,n-1)].'; % n x 1 column vector
-    lambda1 = sigma; 
+    n = size(matrix,1);
+    matrix_shift = matrix - sigma*speye(n);
+
+    u = matrix_shift\randn(n,1); % initial guess
+    u = u / norm(u); % normalize initial guess
+    lambda = 1; 
+    lambda_k = sigma;
     
     if verbose
         tic
     end
 
     while (err > eps && iter < iter_max)
-        matrix_ = matrix - lambda1*speye(n);
+        matrix_ = matrix - lambda_k*speye(n);
         v = matrix_\u;
-        lambda2 = norm(v,2);
-        u = v/lambda2;
-        lambda1 = dot(matrix*u,u);
-
-        err = abs(lambda1-lambda2); % criterion
+        mu = norm(v);
+        u = v/mu;
+        lambda_k = dot(matrix*u,u);
+        err = abs(lambda-lambda_k); % criterion
+        lambda = lambda_k;
         iter = iter + 1;
     end
 
@@ -27,7 +31,7 @@ function [eigval, eigvec, sigma] = inverse_power_method_RQI(matrix, epsilon, ite
         toc
     end
     
-    eigval = lambda1;
+    eigval = lambda;
     eigvec = u;
 
     if verbose

@@ -5,8 +5,9 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
     iter = 0;
 
     n = size(matrix, 1);
-    u = [1,zeros(1,n-1)].'; % n x 1 column vector
-    lambda1 = norm(u,2); % where the 2-norm is 1
+    u = randn(n,1); % initial guess
+    u = u / norm(u); % normalize initial guess
+    lambda = 1; % where the 2-norm is 1
     
     if verbose
         tic
@@ -14,10 +15,10 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
 
     while (err > eps && iter < iter_max)
         v = matrix*u;
-        lambda2 = norm(v,2);
-        u = v/lambda2;
-        err = abs(lambda1-lambda2); % criterion
-        lambda1 = lambda2;
+        lambda_ = v(1);
+        u = v/lambda_;
+        err = abs(lambda-lambda_); % criterion
+        lambda = lambda_;
         iter = iter + 1;
     end
 
@@ -25,11 +26,11 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
         toc
     end
     
-    eigval = lambda1;
+    eigval = lambda;
     eigvec = u;
 
     if verbose
-        fprintf("largest eigenvalues: %f \n", eigval);
+        fprintf("largest eigenvalue: %f \n", eigval);
     end
 
 end
