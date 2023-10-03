@@ -23,6 +23,7 @@ function [eigval, eigvec] = inverse_power_method_LU(matrix, epsilon, iter_max, s
     u = matrix_factor.mtx_Perm_amd * (matrix_factor.mtx_upper_U \ (matrix_factor.mtx_Low_L \ (matrix_factor.mtx_Perm_LU * u(matrix_factor.Perm_amd_vec,:))));
 
     u = u / norm(u); % normalize initial guess
+    [~,idx]  = max(abs(u)); % max eigenvalue index
     lambda1=1;
 
     if verbose
@@ -33,7 +34,7 @@ function [eigval, eigvec] = inverse_power_method_LU(matrix, epsilon, iter_max, s
 
     while (err > eps && iter < iter_max)
         v = matrix_factor.mtx_Perm_amd * (matrix_factor.mtx_upper_U \ (matrix_factor.mtx_Low_L \ (matrix_factor.mtx_Perm_LU * u(matrix_factor.Perm_amd_vec,:))));
-        mu_ = v(1);
+        mu_ = v(idx);
         u = v/mu_;
         err = abs(lambda1-sigma-1/mu_); % criterion
         lambda1 = sigma + 1/mu_;

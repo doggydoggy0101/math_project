@@ -16,25 +16,25 @@ verbose = true;
 fprintf("SII:\n")
 [eigval, eigvec] = inverse_power_method_SII(A, eps, iter, sigma, verbose);
 check = norm(A*eigvec - eigval*eigvec, 2);
-fprintf("norm(Ax-λx): %f \n", check);
+fprintf("norm(Ax-λx): %f \n\n", check);
 
 % Shifted Inverse Iteration
 fprintf("SII with LU:\n")
 [eigval, eigvec] = inverse_power_method_LU(A, eps, iter, sigma, verbose);
 check = norm(A*eigvec - eigval*eigvec, 2);
-fprintf("norm(Ax-λx): %f \n", check);
+fprintf("norm(Ax-λx): %f \n\n", check);
 
 % Newton's Inverse Iteration
 fprintf("NII:\n")
 [eigval, eigvec, ~] = inverse_power_method_NII(A, eps, iter, sigma, verbose);
 check = norm(A*eigvec - eigval*eigvec, 2);
-fprintf("norm(Ax-λx): %f \n", check);
+fprintf("norm(Ax-λx): %f \n\n", check);
 
 % Rayleigh Quotient Iteration
 fprintf("RQI:\n")
 [eigval, eigvec, ~] = inverse_power_method_RQI(A, eps, iter, sigma, verbose);
 check = norm(A*eigvec - eigval*eigvec, 2);
-fprintf("norm(Ax-λx): %f \n", check);
+fprintf("norm(Ax-λx): %f \n\n", check);
 
 
 % addpath(genpath('sample_code'));

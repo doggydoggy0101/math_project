@@ -10,7 +10,7 @@ function [eigval, eigvec] = inverse_power_method_SII(matrix, epsilon, iter_max, 
     u = matrix_shift\randn(n,1); % initial guess
     u = u / norm(u); % normalize initial guess
 
-    % [~,idx]  = max(abs(u)); % max eigenvalue index
+    [~,idx]  = max(abs(u)); % max eigenvalue index
     lambda1=1;
     
     if verbose
@@ -19,7 +19,7 @@ function [eigval, eigvec] = inverse_power_method_SII(matrix, epsilon, iter_max, 
 
     while (err > eps && iter < iter_max)
         v = matrix_shift\u;
-        mu_ = v(1);
+        mu_ = v(idx);
         u = v/mu_;
         err = abs(lambda1-sigma-1/mu_); % criterion
         lambda1 = sigma + 1/mu_;
