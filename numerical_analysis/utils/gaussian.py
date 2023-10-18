@@ -2,7 +2,7 @@
 
 import numpy as np
 
-def Guassian_elimination(A, B):
+def Gaussian_elimination(A, B):
 
     n = B.size
     M = np.hstack([A,B]) #augmented matrix
