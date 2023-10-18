@@ -1,4 +1,4 @@
-libname regress "C:\Users\doggy\regression_analysis\workspace";
+libname regress "D:\SAS\regression_analysis\workspace";
 options nodate nonumber FORMCHAR="|----|+|---+=|-/\<>*"
 
 /data step;
@@ -24,6 +24,6 @@ proc sgplot data=dataset;
 /*regression model*/
 proc reg data=dataset;
 	 model gpa = act;
-	 output out=outut p=p_ lcl=lcl_ ucl=ucl_ rstudent = r ;
+	 output out=outut ;
 	 run;
 quit;
