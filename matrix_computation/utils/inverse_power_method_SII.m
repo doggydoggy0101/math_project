@@ -28,6 +28,7 @@ function [eigval, eigvec] = inverse_power_method_SII(matrix, epsilon, iter_max, 
 
     if verbose
         toc
+        fprintf("iterations: %.0f \n", iter);
     end
     
     eigval = lambda1;

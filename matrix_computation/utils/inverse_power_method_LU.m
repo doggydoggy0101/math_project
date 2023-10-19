@@ -16,11 +16,11 @@ function [eigval, eigvec] = inverse_power_method_LU(matrix, epsilon, iter_max, s
     % [L,U,P] = lu(matrix_shift);
     % u = U\(L\(P*u)); 
 
-    matrix_factor.Perm_amd_vec = amd(matrix_shift);
-    W_reorder = matrix_shift(matrix_factor.Perm_amd_vec, matrix_factor.Perm_amd_vec);
-    matrix_factor.mtx_Perm_amd = sparse(matrix_factor.Perm_amd_vec, 1:n, ones(n,1));
-    [matrix_factor.mtx_Low_L, matrix_factor.mtx_upper_U, matrix_factor.mtx_Perm_LU] = lu(W_reorder);
-    u = matrix_factor.mtx_Perm_amd * (matrix_factor.mtx_upper_U \ (matrix_factor.mtx_Low_L \ (matrix_factor.mtx_Perm_LU * u(matrix_factor.Perm_amd_vec,:))));
+    Perm_amd_vec = amd(matrix_shift);
+    W_reorder = matrix_shift(Perm_amd_vec, Perm_amd_vec);
+    Perm_amd_mtx = sparse(Perm_amd_vec, 1:n, ones(n,1));
+    [mtx_L, mtx_U, mtx_Perm_LU] = lu(W_reorder);
+    u = Perm_amd_mtx*(mtx_U \ (mtx_L \ (mtx_Perm_LU*u(Perm_amd_vec,:))));
 
     u = u / norm(u); % normalize initial guess
     [~,idx]  = max(abs(u)); % max eigenvalue index
@@ -33,7 +33,7 @@ function [eigval, eigvec] = inverse_power_method_LU(matrix, epsilon, iter_max, s
     end
 
     while (err > eps && iter < iter_max)
-        v = matrix_factor.mtx_Perm_amd * (matrix_factor.mtx_upper_U \ (matrix_factor.mtx_Low_L \ (matrix_factor.mtx_Perm_LU * u(matrix_factor.Perm_amd_vec,:))));
+        v = Perm_amd_mtx*(mtx_U \ (mtx_L \ (mtx_Perm_LU*u(Perm_amd_vec,:))));
         mu_ = v(idx);
         u = v/mu_;
         err = abs(lambda1-sigma-1/mu_); % criterion
@@ -43,13 +43,14 @@ function [eigval, eigvec] = inverse_power_method_LU(matrix, epsilon, iter_max, s
 
     if verbose
         toc;
+        fprintf("iterations: %.0f \n", iter);
     end
     
     eigval = lambda1;
     eigvec = u;
 
     if verbose
-        fprintf("eigenvalue closest to %.2f: %f \n",sigma, eigval);
+        fprintf("eigenvalue closest to %.2f: %f \n", sigma, eigval);
     end
 end
 

@@ -15,7 +15,7 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
 
     while (err > eps && iter < iter_max)
         v = matrix*u;
-        lambda_ = v(1);
+        lambda_ = norm(v); % v(1)
         u = v/lambda_;
         err = abs(lambda-lambda_); % criterion
         lambda = lambda_;
@@ -24,6 +24,7 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
 
     if verbose
         toc
+        fprintf("iterations: %.0f \n", iter);
     end
     
     eigval = lambda;

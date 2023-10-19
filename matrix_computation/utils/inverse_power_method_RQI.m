@@ -29,6 +29,7 @@ function [eigval, eigvec, sigma] = inverse_power_method_RQI(matrix, epsilon, ite
 
     if verbose
         toc
+        fprintf("iterations: %.0f \n", iter);
     end
     
     eigval = lambda;
