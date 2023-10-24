@@ -5,6 +5,7 @@ E = load('data/facebook.txt');
 A = getLaplacian(E, true);
 
 m = 30;
+verbose = true;
 
 eps = 1e-14;
 iter = 1e+3;
@@ -42,10 +43,10 @@ fprintf("norm(Ax-λx): %f \n\n", check);
 % fprintf("norm(Ax-λx): %f \n\n", check);
 
 
-function sol = Shift_A_inv_b(rhs, factor)
-    sol = factor.Perm_amd * (factor.U \ (factor.L \ (factor.Perm_LU * rhs(factor.Perm_amd_vec,:))));
-end
-
 function sol = GE_Shift_LS(b, A)
     sol = A \ b;
+end
+
+function sol = Shift_A_inv_b(rhs, factor)
+    sol = factor.Perm_amd * (factor.U \ (factor.L \ (factor.Perm_LU * rhs(factor.Perm_amd_vec,:))));
 end
