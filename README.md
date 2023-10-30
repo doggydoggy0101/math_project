@@ -45,6 +45,8 @@ Matrix Computation (Fall 2023), National Taiwan Normal University
 
 * Power method
 * Inverse power method
+* Arnoldi method
+* Lanczos method
 
 
 <a name="ra"></a>
