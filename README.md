@@ -38,10 +38,6 @@ Discrete Mathematics (Spring 2022), National Taiwan Normal University
 
 * Polya formula
 
-<a name="vo"></a>
-## Visual Odometry
-
-
 <a name="mc"></a>
 ## Matrix Computation
 
