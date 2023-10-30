@@ -5,42 +5,50 @@ options nodate nonumber FORMCHAR="|----|+|---+=|-/\<>*"
 /*load dataset*/
 data dataset;
 	set regress.dataset_brand; 
-	x_1x_2=x_1*x_2 ;
-	run;
+	x1x2 = x1*x2 ;
+run;
 
-/*scatter plot matrix*/
+/*6.5 (a) scatter plot matrix*/
 proc sgscatter data=dataset;
-    matrix y x_1 x_2;
-	run;
+    matrix y x1 x2;
+run;
 
-/*correlation matrix*/
+/*6.5 (a) correlation matrix*/
 proc corr data=dataset;
-	run;
+run;
 
-/*regression*/
+/*6.5 (b) regression*/
 proc reg data=dataset;
-    model y=x_1 x_2 / lackfit;
+    model y=x1 x2 / lackfit;
     output out = output residual=residual predicted=prediction;
-	run;
-	quit;
+run;
 
-/*6.5(b) box plot*/
+/*6.5 (c) box plot of residual*/
 proc sgplot data=output;
 	vbox residual;
-	run;
+run;
 
-/*6.5(c) residual-x1x2*/
+/*6.5 (d) residual-x1x2*/
 proc sgplot data=output;
-	scatter x=x_1x_2 y=residual / markerattrs=(size=10 symbol=Circle color=steel);
-	run;
+	scatter x=x1x2 y=residual / markerattrs=(size=10 symbol=Circle color=steel);
+run;
 
-/*6.7(b)*/
-proc reg data=output;
-    model y=prediction;
-	run;
-	quit;	
+/*6.7 (b) r-square between Y and \hat{Y}*/
+proc reg data=output plots=none;
+    model y=prediction / rsquare;
+run;
 
-/*7.3(a)*/
-proc glm data=dataset;
-	model y=x_1 x_2;
+/*7.3 (a) extra sum of squares*/
+proc glm data=dataset plots=none;
+	model y=x1 x2;
+run;
+
+/*7.12 check the other way*/
+proc glm data=dataset plots=none;
+	model y=x2 x1;
+run;
+
+/*7.12 R_{12}^2*/
+proc glm data=dataset plots=none;
+	model x1= x2; 
 run;
