@@ -2,7 +2,7 @@
 
 Simultaneous Localization and Mapping implemetation
 
-1. run ```dataDownloader.m``` or download dataset 'freiburg3_long_office_household' from https://cvg.cit.tum.de/rgbd/dataset/ manually. Data sturcture should be as follow:
+1. run ```dataDownloader.m``` or download dataset 'freiburg3_long_office_household' from https://cvg.cit.tum.de/rgbd/dataset/ manually. Data sturcture should be as follows:
 
  ```shell
  |--- dataset
