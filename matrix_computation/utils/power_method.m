@@ -17,20 +17,20 @@ function [eigval, eigvec] = power_method(matrix, epsilon, iter_max, verbose)
         v = matrix*u;
         lambda_ = norm(v); % v(1)
         u = v/lambda_;
-        err = abs(lambda-lambda_); % criterion
+        % criterion
+        err = abs(lambda-lambda_); 
+        % err = norm(matrix*u - u*lambda_,2);
+
         lambda = lambda_;
         iter = iter + 1;
     end
 
-    if verbose
-        toc
-        fprintf("iterations: %.0f \n", iter);
-    end
-    
     eigval = lambda;
     eigvec = u;
 
     if verbose
+        toc
+        fprintf("iterations: %.0f \n", iter);
         fprintf("largest eigenvalue: %f \n", eigval);
     end
 

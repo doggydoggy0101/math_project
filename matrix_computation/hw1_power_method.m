@@ -1,7 +1,7 @@
 clc;clear; 
 addpath(genpath('utils'));
 
-E = load('data/brightkite.txt'); 
+E = load('data/gowalla.txt'); 
 A = getLaplacian(E, true);
 
 eps = 1e-7;
