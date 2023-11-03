@@ -1,4 +1,4 @@
-function [U, T] = lanczos_method(matrix, k, tol, verbose)
+function [U, T] = lanczos_method(matrix, k_wanted, k_max, tol, verbose)
 
     if verbose
         tic
@@ -17,7 +17,7 @@ function [U, T] = lanczos_method(matrix, k, tol, verbose)
 
     U(:,2) = v / T(2,1);
 
-    for i = 2:k
+    for i = 2:k_max
 
         T(i-1,i) = T(i,i-1); 
 
@@ -30,14 +30,14 @@ function [U, T] = lanczos_method(matrix, k, tol, verbose)
         U(:,i+1) = v / T(i+1, i);
 
         % criteria
-        [eigvec, eigval] = eigs(T(1:i, 1:i), 1);
+        [eigvec, eigval] = eigs(T(1:i, 1:i), k_wanted);
 
         % define stopping criteria:
         % ritzvec = U(:,1:i)*eigvec;
-        % loss1 = norm(matrix*ritzvec - ritzvec*eigval);
+        % loss = norm(matrix*ritzvec - ritzvec*eigval);
 
         % which is equivalent to:
-        loss = abs(T(i+1, i))*abs(eigvec(i));
+        loss = abs(T(i+1,i))*norm(eigvec(i,:));
 
         if loss < tol
             break
@@ -50,6 +50,11 @@ function [U, T] = lanczos_method(matrix, k, tol, verbose)
     if verbose
         toc
         fprintf("iterations: %.0f \n", i);
-        fprintf("largest eigenvalue: %f \n", eigval);
+        if k_wanted == 1
+            fprintf("largest eigenvalue: %f\n", eigval);
+        else
+            fprintf("largest %.0f eigenvalues:\n\n", k_wanted);
+            disp(diag(eigval))
+        end
     end
 end

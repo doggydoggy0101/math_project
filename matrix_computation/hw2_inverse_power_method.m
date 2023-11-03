@@ -1,13 +1,12 @@
 clc;clear; 
-addpath(genpath('utils'));
+addpath(genpath('utils')); verbose = true;
 
 E = load('data/facebook.txt');
-A = getLaplacian(E, true);
+A = getLaplacian(E, verbose);
 
 eps = 1e-7;
 iter = 1e+3;
 sigma = 0.01;
-verbose = true;
 
 % Shifted Inverse Iteration
 fprintf("SII:\n")

@@ -1,12 +1,11 @@
 clc;clear; 
-addpath(genpath('utils'));
+addpath(genpath('utils')); verbose = true;
 
 E = load('data/gowalla.txt'); 
-A = getLaplacian(E, true);
+A = getLaplacian(E, verbose);
 
 eps = 1e-7;
 iter = 1e+5;
-verbose = true;
 
 [eigval, eigvec] = power_method(A, eps, iter, verbose);
 

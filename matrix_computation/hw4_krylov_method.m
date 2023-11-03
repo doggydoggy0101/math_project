@@ -1,8 +1,8 @@
 clc;clear;
-addpath(genpath('utils'));
+addpath(genpath('utils')); verbose = true;
 
 E = load('data/facebook.txt');
-A = getLaplacian(E, true);
+A = getLaplacian(E, verbose);
 
 m = 30;
 verbose = true;

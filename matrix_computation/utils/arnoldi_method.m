@@ -1,4 +1,4 @@
-function [U, H] = arnoldi_method(matrix, k, tol, verbose)
+function [U, H] = arnoldi_method(matrix, k_wanted, k_max, tol, verbose)
     
     if verbose
         tic
@@ -9,11 +9,11 @@ function [U, H] = arnoldi_method(matrix, k, tol, verbose)
     u = matrix\randn(n,1); % initial guess
     u = u / norm(u); % normalize initial guess
 
-    H = zeros(k+1, k);
+    H = zeros(k_max+1, k_max);
     U = u;
 
     k_i = 0;
-    for i = 1:k
+    for i = 1:k_max
         v = matrix*U(:,i);
     
         for j = 1:i
@@ -31,14 +31,14 @@ function [U, H] = arnoldi_method(matrix, k, tol, verbose)
 
         % criteria
         if k_i > 1
-            [eigvec, eigval] = eigs(H(1:k_i,1:k_i), 1);
+            [eigvec, eigval] = eigs(H(1:k_i,1:k_i), k_wanted);
 
             % define stopping criteria:
             % ritzvec = U(:,1:k_i)*eigvec;
-            % loss1 = norm(matrix*ritzvec - ritzvec_*eigval);
+            % loss = norm(matrix*ritzvec - ritzvec*eigval);
 
             % which is equivalent to:
-            loss = abs(H(k_i+1,k_i))*abs(eigvec(k_i));
+            loss = abs(H(k_i+1,k_i))*norm(eigvec(k_i,:));
 
             if loss < tol
                 break
@@ -53,6 +53,11 @@ function [U, H] = arnoldi_method(matrix, k, tol, verbose)
     if verbose
         toc
         fprintf("iterations: %.0f \n", k_i);
-        fprintf("largest eigenvalue: %f \n", eigval);
+        if k_wanted == 1
+            fprintf("largest eigenvalue: %f\n", eigval);
+        else
+            fprintf("largest %.0f eigenvalues:\n\n", k_wanted);
+            disp(diag(eigval))
+        end
     end
 end
