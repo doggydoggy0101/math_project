@@ -1,8 +1,4 @@
 classdef visualize_MfS < handle
-%helperVisualizeMatchedFeatures show map points and camera trajectory
-%
-%   This is an example helper class that is subject to change or removal 
-%   in future releases.
 
 %   Copyright 2019-2022 The MathWorks, Inc.
 
@@ -20,8 +16,6 @@ classdef visualize_MfS < handle
         MapPointsPlot
  
         EstimatedTrajectory
-        
-        OptimizedTrajectory
 
         CameraPlot
     end
@@ -40,9 +34,9 @@ classdef visualize_MfS < handle
             obj.MapPointsPlot = pcplayer(obj.XLim, obj.YLim, obj.ZLim, ...
                 'VerticalAxis', 'y', 'VerticalAxisDir', 'down');
             
-            obj.Axes  = obj.MapPointsPlot.Axes;
+            obj.Axes = obj.MapPointsPlot.Axes;
             obj.MapPointsPlot.view(xyzPoints); 
-            obj.Axes.Children.DisplayName = 'Map points';
+            obj.Axes.Children.DisplayName = 'landmarks';
             
             hold(obj.Axes, 'on');
             
@@ -51,7 +45,7 @@ classdef visualize_MfS < handle
             
             % Plot camera trajectory
             obj.EstimatedTrajectory = plot3(obj.Axes, trajectory(:,1), trajectory(:,2), ...
-                trajectory(:,3), 'r', 'LineWidth', 2 , 'DisplayName', 'Estimated trajectory');
+                trajectory(:,3), 'r', 'LineWidth', 1 , 'DisplayName', 'poses');
             
             % Plot the current cameras
             obj.CameraPlot = plotCamera(currPose, 'Parent', obj.Axes, 'Size', 0.05);
@@ -65,26 +59,14 @@ classdef visualize_MfS < handle
             obj.MapPointsPlot.view(xyzPoints);
             
             % Update the camera trajectory
-            set(obj.EstimatedTrajectory, 'XData', trajectory(:,1), 'YData', ...
-                trajectory(:,2), 'ZData', trajectory(:,3));
-            
-            % Update the current camera pose since the first camera is fixed
+            set(obj.EstimatedTrajectory, 'XData', trajectory(:,1), 'YData', trajectory(:,2), 'ZData', trajectory(:,3));
+
             obj.CameraPlot.AbsolutePose = currPose.AbsolutePose;
-            obj.CameraPlot.Label        = num2str(currPose.ViewId);
+            obj.CameraPlot.Label = num2str(currPose.ViewId);
             
             drawnow limitrate
         end
         
-        function plotOptimizedTrajectory(obj, poses)
-            
-            % Delete the camera plot
-            delete(obj.CameraPlot);
-            
-            % Plot the optimized trajectory
-            trans = vertcat(poses.AbsolutePose.Translation);
-            obj.OptimizedTrajectory = plot3(obj.Axes, trans(:, 1), trans(:, 2), trans(:, 3), 'm', ...
-                'LineWidth', 2, 'DisplayName', 'Optimized trajectory');
-        end
         
         function plotActualTrajectory(obj, gTruth, optimizedPoses)
             estimatedCams = vertcat(optimizedPoses.AbsolutePose.Translation);
@@ -95,23 +77,21 @@ classdef visualize_MfS < handle
             updatePlotScale(obj, scale);
             
             % Plot the ground truth
-            plot3(obj.Axes, actualCams(:,1), actualCams(:,2), actualCams(:,3), ...
-                'g','LineWidth',2, 'DisplayName', 'Ground truth');
+            plot3(obj.Axes, actualCams(:,1), actualCams(:,2), actualCams(:,3), 'g','LineWidth',1, 'DisplayName', 'Ground truth');
             
             drawnow limitrate
         end
         
         function showLegend(obj)
             % Add a legend to the axes
-            hLegend = legend(obj.Axes, 'Location',  'northeast', ...
-                'TextColor', [1 1 1], 'FontWeight', 'bold');
+            legend(obj.Axes, 'Location',  'northeast', 'TextColor', [1 1 1], 'FontWeight', 'bold');
         end
     end
     
     methods (Access = private)
         function [xyzPoints, currPose, trajectory]  = retrievePlottedData(obj, vSetKeyFrames, mapPoints)
-            camPoses    = poses(vSetKeyFrames);
-            currPose    = camPoses(end,:); % Contains both ViewId and Pose
+            camPoses = poses(vSetKeyFrames);
+            currPose = camPoses(end,:); % Contains both ViewId and Pose
 
             % Ensure the rotation matrix is a rigid transformation
             R = double(currPose.AbsolutePose.R);
@@ -121,8 +101,8 @@ classdef visualize_MfS < handle
             currPose.AbsolutePose.A(1:3, 4) = t;
             currPose.AbsolutePose.A(1:3, 1:3) = U * V';
 
-            trajectory  = vertcat(camPoses.AbsolutePose.Translation);
-            xyzPoints   = mapPoints.WorldPoints;
+            trajectory = vertcat(camPoses.AbsolutePose.Translation);
+            xyzPoints = mapPoints.WorldPoints;
             
             % Only plot the points within the limit
             inPlotRange = xyzPoints(:, 1) > obj.XLim(1) & ...
@@ -143,14 +123,11 @@ classdef visualize_MfS < handle
             obj.Axes.Children(end).XData = obj.Axes.Children(end).XData * scale;
             obj.Axes.Children(end).YData = obj.Axes.Children(end).YData * scale;
             obj.Axes.Children(end).ZData = obj.Axes.Children(end).ZData * scale;
-            
+
             % Estiamted and optimized Camera trajectory
             obj.EstimatedTrajectory.XData =  obj.EstimatedTrajectory.XData * scale;
             obj.EstimatedTrajectory.YData =  obj.EstimatedTrajectory.YData * scale;
             obj.EstimatedTrajectory.ZData =  obj.EstimatedTrajectory.ZData * scale;
-            obj.OptimizedTrajectory.XData =  obj.OptimizedTrajectory.XData * scale;
-            obj.OptimizedTrajectory.YData =  obj.OptimizedTrajectory.YData * scale;
-            obj.OptimizedTrajectory.ZData =  obj.OptimizedTrajectory.ZData * scale;
         end
     end
 end

@@ -1,4 +1,4 @@
-function rmse = trajectory_error(gTruth, cameraPoses, pose)
+function rmse = trajectory_error(gTruth, cameraPoses)
 
     locations = vertcat(cameraPoses.AbsolutePose.Translation);
     gLocations = vertcat(gTruth.Translation);
@@ -7,6 +7,6 @@ function rmse = trajectory_error(gTruth, cameraPoses, pose)
     scaledLocations = locations * scale;
     
     rmse = sqrt(mean(sum((scaledLocations - gLocations).^2, 2)));
-    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse), pose]);
+    disp(['Absolute RMSE for key frame trajectory (m): ', num2str(rmse)]);
 
 end

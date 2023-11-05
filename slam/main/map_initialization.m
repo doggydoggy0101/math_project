@@ -1,4 +1,4 @@
-function [relPose, xyzWorldPoints, indexPairs, currPoints, currFeatures] = map_initialization(intrinsics, imds, currFrameIdx, numFrames, preFeatures, prePoints, ...
+function [relPose, xyzWorldPoints, indexPairs, currPoints, currFeatures, currFrameIdx] = map_initialization(intrinsics, imds, currFrameIdx, numFrames, preFeatures, prePoints, ...
     scaleFactor, numLevels, numPoints, matchUnique, maxRatio, matchThreshold, minMatches, ratioThreshold, minParallax)
 addpath(genpath('./utils'))
 
@@ -12,10 +12,10 @@ addpath(genpath('./utils'))
         % Find putative feature matches
         indexPairs = matchFeatures(preFeatures, currFeatures, Unique=matchUnique, MaxRatio=maxRatio, MatchThreshold=matchThreshold);
     
-        preMatchedPoints = prePoints(indexPairs(:,1),:);
-        currMatchedPoints = currPoints(indexPairs(:,2),:);
+        preMatchedPoints = prePoints(indexPairs(:,1),:); % matched feature points
+        currMatchedPoints = currPoints(indexPairs(:,2),:); % matched feature points
       
-        if size(indexPairs, 1) < minMatches % threshold
+        if size(indexPairs, 1) < minMatches % num matched threshold
             continue 
         end
     
@@ -31,8 +31,8 @@ addpath(genpath('./utils'))
         end
     
         % relative pose (1/2 points)
-        inlierPrePoints = preMatchedPoints(inlierTformIdx);
-        inlierCurrPoints = currMatchedPoints(inlierTformIdx);
+        inlierPrePoints = preMatchedPoints(inlierTformIdx); % matched feature points inlier
+        inlierCurrPoints = currMatchedPoints(inlierTformIdx); % matched feature points inlier
         [relPose, validFraction] = estrelpose(tform, intrinsics, inlierPrePoints(1:2:end), inlierCurrPoints(1:2:end));
     
         if validFraction < 0.9 || numel(relPose)==3 % threshold

@@ -1,16 +1,10 @@
+%   Copyright 2019-2022 The MathWorks, Inc.
 function [mapPoints, vSetKeyFrames, recentPointIdx] = create_map_points(...
     mapPoints, vSetKeyFrames, currKeyFrameId, intrinsics, scaleFactor, minNumMatches, minParallax)
-%helperCreateNewMapPoints creates new map points by triangulating matched 
-%   feature points in the current key frame and the connected key frames.
-%
-%   This is an example helper function that is subject to change or removal 
-%   in future releases.
-
-%   Copyright 2019-2022 The MathWorks, Inc.
 
 % Get connected key frames 
-KcViews  = connectedViews(vSetKeyFrames, currKeyFrameId, minNumMatches);
-KcIDs    = KcViews.ViewId;
+KcViews = connectedViews(vSetKeyFrames, currKeyFrameId, minNumMatches);
+KcIDs = KcViews.ViewId;
 
 % Retreive data of the current key frame
 currPose        = vSetKeyFrames.Views.AbsolutePose(currKeyFrameId);

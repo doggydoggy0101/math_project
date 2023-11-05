@@ -7,8 +7,8 @@ function [F, score, inliersIndex] = compute_fundamental_matrix(matchedPoints1, m
     
     inliersIndex = find(inliersLogicalIndex);
     
-    locations1 = inlierPoints1.Location;
-    locations2 = inlierPoints2.Location;
+    locations1 = inlierPoints1.Location; % pixel coordinate
+    locations2 = inlierPoints2.Location; % pixel coordinate
     
     % Distance from points to epipolar line
     lineIn1 = epipolarLine(F', locations2);

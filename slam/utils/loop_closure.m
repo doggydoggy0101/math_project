@@ -1,12 +1,6 @@
+%   Copyright 2019-2022 The MathWorks, Inc.
 function [isDetected, loopKeyFrameIds] = loop_closure(vSetKeyFrames, ...
     currKeyframeId, imageDatabase, currImg, loopEdgeNumMatches)
-%helperCheckLoopClosure detect loop candidates key frames by retrieving
-%   visually similar images from the feature database.
-%
-%   This is an example helper function that is subject to change or removal 
-%   in future releases.
-
-%   Copyright 2019-2022 The MathWorks, Inc.
 
 % Retrieve all the visually similar key frames
 [candidateViewIds, similarityscores] = retrieveImages(currImg, imageDatabase);

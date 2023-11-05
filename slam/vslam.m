@@ -2,6 +2,7 @@ clc;clear;rng(0);
 addpath(genpath('main')); addpath(genpath('utils')); addpath(genpath('visualize')); 
 
 imageFolder = 'dataset/rgbd_dataset_freiburg3_long_office_household/rgb/';
+% imageFolder = 'dataset/kitti/sequences/07/image_0/';
 
 imds = imageDatastore(imageFolder);
 numFrames = numel(imds.Files);
@@ -14,8 +15,6 @@ numFrames = numel(imds.Files);
 focalLength = [535.4, 539.2]; 
 principalPoint = [320.1, 247.6];  
 
-
-
 % paramters
 scaleFactor = 1.2; numLevels = 8; % image pyramid
 numPoints = 1000; % uniform distributed feature points
@@ -25,6 +24,11 @@ ratioThreshold = 0.45; % homography/fundamental
 minParallax = 1; % degree
 absTor = 1e-7; relTor = 1e-15; % BA
 baSolver = "preconditioned-conjugate-gradient";
+
+numSkipFrames = 20; % keyframe gap
+numPointsKeyFrame = 100; % map points
+ratioPointsTracked = 0.9; 
+localBAframes = 5;
 
 
 
@@ -44,12 +48,11 @@ firstI = currI;
 
 
 % map initialization
-[relPose, xyzWorldPoints, indexPairs, currPoints, currFeatures] = map_initialization(intrinsics, imds, currFrameIdx, numFrames, preFeatures, prePoints, ...
+[relPose, xyzWorldPoints, indexPairs, currPoints, currFeatures, currFrameIdx] = map_initialization(intrinsics, imds, currFrameIdx, numFrames, preFeatures, prePoints, ...
     scaleFactor, numLevels, numPoints, matchUnique, maxRatio, matchThreshold, minMatches, ratioThreshold, minParallax);
 
 
-
-% graph initialization
+% graph initialization (key frames)
 preViewId = 1; currViewId = 2;
 
 vSetKeyFrames = imageviewset; % store key frames
@@ -89,14 +92,13 @@ mapPlot = visualize_MfS(vSetKeyFrames, mapPointSet);
 showLegend(mapPlot);
 
 
-
 currKeyFrameId = currViewId;
 lastKeyFrameId = currViewId;
 lastKeyFrameIdx  = currFrameIdx - 1; 
 addedFramesIdx = [1; lastKeyFrameIdx];
 isLoopClosed = false;
 
-
+disp(vSetKeyFrames.Views)
 
 % Main loop
 isLastFrameKeyFrame = true;
@@ -105,17 +107,14 @@ while ~isLoopClosed && currFrameIdx < numFrames
 
     [currFeatures, currPoints] = feature_detection(currI, scaleFactor, numLevels, numPoints);
 
-    % mapPointsIdx -> Indices of the map points observed in the current frame
-    % featureIdx -> Indices of the corresponding feature points in the current frame
+    % get new pose, index of map points in current frame, index of corresponding feature points in current frame
     [currPose, mapPointsIdx, featureIdx] = track_last_keyframe(mapPointSet, vSetKeyFrames.Views, ...
         currFeatures, currPoints, lastKeyFrameId, intrinsics, scaleFactor);
 
     % localKeyFrameIds -> ViewId of the connected key frames of the current frame
-    numSkipFrames = 20; % keyframe gap
-    numPointsKeyFrame = 100; % map points
     [localKeyFrameIds, currPose, mapPointsIdx, featureIdx, isKeyFrame] = track_local_map(mapPointSet, vSetKeyFrames, ...
         mapPointsIdx, featureIdx, currPose, currFeatures, currPoints, intrinsics, scaleFactor, numLevels, ...
-        isLastFrameKeyFrame, lastKeyFrameIdx, currFrameIdx, numSkipFrames, numPointsKeyFrame);
+        isLastFrameKeyFrame, lastKeyFrameIdx, currFrameIdx, numSkipFrames, numPointsKeyFrame, ratioPointsTracked);
 
     % Visualize matched features
     updatePlot(featurePlot, currI, currPoints(featureIdx));
@@ -133,7 +132,7 @@ while ~isLoopClosed && currFrameIdx < numFrames
     [mapPointSet, vSetKeyFrames] = add_keyframe(mapPointSet, vSetKeyFrames, ...
         currPose, currFeatures, currPoints, mapPointsIdx, featureIdx, localKeyFrameIds);
 
-    % remove outlier
+    % remove map points that is not seen in current frame
     outlierIdx = setdiff(newPointIdx, mapPointsIdx);
     if ~isempty(outlierIdx)
         mapPointSet = removeWorldPoints(mapPointSet, outlierIdx);
@@ -146,33 +145,42 @@ while ~isLoopClosed && currFrameIdx < numFrames
         currKeyFrameId, intrinsics, scaleFactor, minNumMatches, minParallax);
 
     % local bundle adjustment
-    [refinedViews, dist] = connectedViews(vSetKeyFrames, currKeyFrameId, MaxDistance=2);
+    [refinedViews, dist] = connectedViews(vSetKeyFrames, currKeyFrameId, MaxDistance=localBAframes);
     refinedKeyFrameIds = refinedViews.ViewId;
-    fixedViewIds = refinedKeyFrameIds(dist==2);
+    fixedViewIds = refinedKeyFrameIds(dist==localBAframes);
     fixedViewIds = fixedViewIds(1:min(10, numel(fixedViewIds)));
 
-    % bundle adjustment
     [mapPointSet, vSetKeyFrames, mapPointIdx] = bundleAdjustment(mapPointSet, vSetKeyFrames, ...
         [refinedKeyFrameIds; currKeyFrameId], intrinsics, FixedViewIDs=fixedViewIds, PointsUndistorted=true, ...
         AbsoluteTolerance=absTor, RelativeTolerance=relTor, Solver=baSolver, MaxIteration=10);
 
     mapPointSet = updateLimitsAndDirection(mapPointSet, mapPointIdx, vSetKeyFrames.Views);
     mapPointSet = updateRepresentativeView(mapPointSet, mapPointIdx, vSetKeyFrames.Views);
+
     updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
 
     % Check loop closure after some key frames have been created    
-    if currKeyFrameId > 20
+    if currKeyFrameId > 50
 
         loopEdgeNumMatches = 50; % num of feature matches of loop edges
 
-        [isDetected, validLoopCandidates] = loop_closure(vSetKeyFrames, currKeyFrameId, ...
-            loopDatabase, currI, loopEdgeNumMatches);
+        [isDetected, validLoopCandidates] = loop_closure(vSetKeyFrames, currKeyFrameId,  loopDatabase, currI, loopEdgeNumMatches);
 
         if isDetected 
-            [isLoopClosed, mapPointSet, vSetKeyFrames] = loop_connections(...
-                mapPointSet, vSetKeyFrames, validLoopCandidates, currKeyFrameId, ...
-                currFeatures, loopEdgeNumMatches);
+            [isLoopClosed, mapPointSet, vSetKeyFrames] = loop_connections( mapPointSet, vSetKeyFrames, ...
+                validLoopCandidates, currKeyFrameId, currFeatures, loopEdgeNumMatches);
         end
+    end
+
+    if isLoopClosed
+        minNumMatches = 20;
+        vSetKeyFramesOptim = optimizePoses(vSetKeyFrames, minNumMatches, Tolerance=1e-16);
+    
+        mapPointSet = pose_graph(mapPointSet, vSetKeyFrames, vSetKeyFramesOptim);
+        vSetKeyFrames = vSetKeyFramesOptim;
+        updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
+        disp(currFrameIdx)
+        fprintf("loop detected\n")
     end
 
     if ~isLoopClosed
@@ -183,30 +191,20 @@ while ~isLoopClosed && currFrameIdx < numFrames
     lastKeyFrameIdx = currFrameIdx;
     addedFramesIdx = [addedFramesIdx; currFrameIdx]; %#ok<AGROW>
     currFrameIdx = currFrameIdx + 1;
-    
 end 
 
 
-if isLoopClosed
-    minNumMatches = 20;
-    vSetKeyFramesOptim = optimizePoses(vSetKeyFrames, minNumMatches, Tolerance=1e-16);
+absolutePoses = poses(vSetKeyFrames);
 
-    mapPointSet = pose_graph(mapPointSet, vSetKeyFrames, vSetKeyFramesOptim);
-    updatePlot(mapPlot, vSetKeyFrames, mapPointSet);
-    optimizedPoses  = poses(vSetKeyFramesOptim);
-
-    plotOptimizedTrajectory(mapPlot, optimizedPoses)
-    showLegend(mapPlot);
-end
 
 % Load ground truth 
 gTruthData = load("orbslamGroundTruth.mat");
 gTruth = gTruthData.gTruth;
 
 % Plot the actual camera trajectory 
-plotActualTrajectory(mapPlot, gTruth(addedFramesIdx), optimizedPoses);
+plotActualTrajectory(mapPlot, gTruth(addedFramesIdx), absolutePoses);
 
 % Show legend
 showLegend(mapPlot);
 
-trajectory_error(gTruth(addedFramesIdx), optimizedPoses);
+trajectory_error(gTruth(addedFramesIdx), absolutePoses);
