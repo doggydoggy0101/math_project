@@ -19,7 +19,8 @@ for iterations = 10:10:50
     plot(eigval_H, zeros(k,1), 'o', MarkerSize=10, Color="#0072BD"); 
     plot(eigval_T, zeros(k,1), '^', MarkerSize=7, Color="red"); 
     plot(eigval_A, zeros(k,1), '.', MarkerSize=10, Color="black"); 
-    title("Iteration: "+iterations); axis([-300 15000 -1 1]);
+    title("Iteration: "+iterations); 
+    axis([-300 15000 -1 1]);
 
     if iterations == 10
         lgnd = legend({'Arnoldi', 'Lanczos', 'Ground truth'},'Position', [0.78 0.88 0.1 0.1]);
