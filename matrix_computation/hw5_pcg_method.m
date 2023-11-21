@@ -17,7 +17,7 @@ b = randn(n,1);
 
 fprintf("CG method:\n")
 tic;
-[sol,~,~,iter] = pcg_method(b, A_shift, tol, maxit);
+[sol,~,~,iter] = pcg_method(A_shift, b, tol, maxit);
 toc;
 check = norm(A_shift*sol-b,2);
 fprintf("iterations: %.0f\n", iter)
@@ -28,7 +28,7 @@ prec_M = sparse(1:n, 1:n, diag(A_shift));
 
 fprintf("CG method with preconditioning:\n")
 tic;
-[sol,~,~,iter] = pcg_method(b, A_shift, tol, maxit, prec_M);
+[sol,~,~,iter] = pcg_method(A_shift, b, tol, maxit, prec_M);
 toc;
 check = norm(A_shift*sol-b,2);
 fprintf("iterations: %.0f\n", iter)
@@ -40,8 +40,27 @@ prec_M2 = prec_M1;
 
 fprintf("CG method with left and right preconditioning:\n")
 tic;
-[sol,~,~,iter] = pcg_method(b, A_shift, tol, maxit, prec_M1, prec_M2);
+[sol,~,~,iter] = pcg_method(A_shift, b, tol, maxit, prec_M1, prec_M2);
 toc;
 check = norm(A_shift*sol-b,2);
 fprintf("iterations: %.0f\n", iter)
 fprintf("norm(Ax-b): %f \n\n", check);
+
+
+lower_L = tril(A_shift, -1);
+diag_D = sparse(1:n,1:n,diag(A_shift));
+w = 1.15;
+D_omegaL = diag_D + w*lower_L;
+
+fprintf("CG method with SSOR preconditioning:\n")
+tic;
+[sol,~,~,iter] = pcg(A_shift, b, tol, maxit, @(x)prec_SSOR(x, D_omegaL, diag_D));
+toc;
+check = norm(A_shift*sol-b,2);
+fprintf("iterations: %.0f\n", iter)
+fprintf("norm(Ax-b): %f \n\n", check);
+
+
+function sol = prec_SSOR(rhs, D_omegaL, diag_D)
+    sol = D_omegaL' \ (diag_D * (D_omegaL \ rhs));
+end
