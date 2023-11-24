@@ -42,7 +42,7 @@ class dataProcess:
 
     def hours(self, x):
         if self.check(x[2]):
-            return np.float64(x[2])
+            return (np.float64(x[0])+np.float64(x[2]))/2
         elif self.check(x[0]):
             return np.float64(x[0]) if x[0] == '0' else np.float64(x[0])+1
         else: 
@@ -68,4 +68,4 @@ for labels in process.label["new"][7:12]:
 
 # df.head(10)
 
-df.to_csv("math_score.csv", encoding='utf-8')
+df.to_csv("math_score.csv", encoding='utf-8', index=False)
