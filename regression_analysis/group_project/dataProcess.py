@@ -44,15 +44,37 @@ class dataProcess:
         if self.check(x[2]):
             return (np.float64(x[0])+np.float64(x[2]))/2
         elif self.check(x[0]):
-            return np.float64(x[0]) if x[0] == '0' else np.float64(x[0])+1
+            return np.float64(x[0]) 
+        else: 
+            raise ValueError('error')    
+
+    def hours_interval(self, x):
+        if self.check(x[2]):
+            return x[:3]
+        elif self.check(x[0]):
+            return x[0] 
         else: 
             raise ValueError('error')    
 
 
-raw_df = pd.read_csv('math_score_raw.csv')
+raw_df = pd.read_csv('data/math_score_raw.csv')
 
 ### seperate line 27
 raw_df = raw_df.drop(27)
+
+
+df = pd.DataFrame()
+process = dataProcess()
+
+for i in range(process.len):
+    df[process.label["new"][i]] = raw_df[process.label["old"][i]]
+df["grade"] = df["grade"].apply(lambda x: process.grade(x))
+df["gender"] = df["gender"].apply(lambda x: process.gender(x))
+df["extras"] = df["extras"].apply(lambda x: process.extras(x))
+for labels in process.label["new"][7:12]:
+    df[labels] = df[labels].apply(lambda x: process.hours_interval(x))
+
+df.to_csv("data/math_score_plot.csv", encoding='utf-8', index=False)
 
 
 df = pd.DataFrame()
@@ -68,4 +90,4 @@ for labels in process.label["new"][7:12]:
 
 # df.head(10)
 
-df.to_csv("math_score.csv", encoding='utf-8', index=False)
+df.to_csv("data/math_score.csv", encoding='utf-8', index=False)
