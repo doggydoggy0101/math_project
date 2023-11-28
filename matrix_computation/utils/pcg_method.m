@@ -1,4 +1,4 @@
-function [sol, flag, RelRes, ITER] = pcg_method(b, shift_L, tol, maxit, prec_M1, prec_M2)
+function [sol, flag, RelRes, ITER] = pcg_method(shift_L, b, tol, maxit, prec_M1, prec_M2)
 
     if (nargin == 4)
         [sol, flag, RelRes, ITER] = pcg(shift_L, b, tol, maxit);
