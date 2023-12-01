@@ -63,6 +63,8 @@ raw_df = pd.read_csv('data/math_score_raw.csv')
 raw_df = raw_df.drop(27)
 
 
+## plot
+
 df = pd.DataFrame()
 process = dataProcess()
 
@@ -77,6 +79,8 @@ for labels in process.label["new"][7:12]:
 df.to_csv("data/math_score_plot.csv", encoding='utf-8', index=False)
 
 
+## data
+
 df = pd.DataFrame()
 process = dataProcess()
 
@@ -88,6 +92,16 @@ df["extras"] = df["extras"].apply(lambda x: process.extras(x))
 for labels in process.label["new"][7:12]:
     df[labels] = df[labels].apply(lambda x: process.hours(x))
 
-# df.head(10)
-
 df.to_csv("data/math_score.csv", encoding='utf-8', index=False)
+
+## interaction
+
+df2 = pd.DataFrame()
+
+for i in range(process.len):
+    for j in range(i+1, process.len):
+        label_i = process.label["new"][i] + "*" + process.label["new"][j]
+        df2[label_i] = df[process.label["new"][i]]*df[process.label["new"][j]]
+df2["score"] = df["score"]
+
+df.to_csv("data/math_score_interact.csv", encoding='utf-8', index=False)
