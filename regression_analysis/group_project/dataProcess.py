@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+print("data processing...")
+
 class dataProcess:
     def __init__(self):
       
@@ -93,7 +95,7 @@ for labels in process.label["new"][7:12]:
     df[labels] = df[labels].apply(lambda x: process.hours(x))
 
 df.to_csv("data/math_score.csv", encoding='utf-8', index=False)
-print("process done")
+print("    process done")
 
 ## interaction
 
@@ -106,4 +108,4 @@ for i in range(process.len):
 df2["score"] = df["score"]
 
 df2.to_csv("data/math_score_interact.csv", encoding='utf-8', index=False)
-print("interaction term done\n")
+print("    interaction term done\n")
