@@ -93,15 +93,17 @@ for labels in process.label["new"][7:12]:
     df[labels] = df[labels].apply(lambda x: process.hours(x))
 
 df.to_csv("data/math_score.csv", encoding='utf-8', index=False)
+print("process done")
 
 ## interaction
 
 df2 = pd.DataFrame()
 
 for i in range(process.len):
-    for j in range(i+1, process.len):
+    for j in range(i+1, process.len-1):
         label_i = process.label["new"][i] + "*" + process.label["new"][j]
         df2[label_i] = df[process.label["new"][i]]*df[process.label["new"][j]]
 df2["score"] = df["score"]
 
-df.to_csv("data/math_score_interact.csv", encoding='utf-8', index=False)
+df2.to_csv("data/math_score_interact.csv", encoding='utf-8', index=False)
+print("interaction term done\n")
