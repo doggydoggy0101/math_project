@@ -2,14 +2,26 @@ import numpy as np
 
 def simplex_iteration(X):
 
-    m = np.shape(X)[0] - 1
-    n = np.shape(X)[1] - 1
+    m = X.shape[0] - 1
+    n = X.shape[1] - 1
+
+    print("linear equation system:")
+    for row in range(m+1):
+        text = ""
+        for i in range(n):
+            if X[row, i] != 0:
+                text_i = "+" + str(X[row, i]) + "x" + str(i+1) + " " if text != "" and X[row, i] > 0 else str(X[row, i]) + "x" + str(i+1) + " "
+                text += text_i
+        text_i = "=" + str(X[row, n])
+        text += text_i
+        print(text)
+    print("\n" + "-"*50)
 
     F = np.zeros(n) # 給 basic feasible sol空間
     label = np.zeros(m) # 給 table左邊那排 label空間
     tt = 0 # 係數為正的數量
     num = 0 # 跌代次數
-    while tt !=n:
+    while tt != n:
 
         tlabel=0
         tt=0 # 係數為正的數量
@@ -19,7 +31,6 @@ def simplex_iteration(X):
             for i in np.arange(n):
                 if X[j][i]==1 and np.sum(X[:,i])==1:
                     label[j]=i+1
-
 
         mlabel=np.array([]) # 係數為負
         for t in np.arange(n):
@@ -35,7 +46,7 @@ def simplex_iteration(X):
                 ff=int(label[f]-1)
                 F[ff]=X[f,n]
             
-            print("\n-----------------------------------\n")
+            print("\n" + "-"*50 +"\n")
             print("iterations:",str(num))
             print("basic variables (index):", str(label))
             print("basic feasible solution:", str(F))
