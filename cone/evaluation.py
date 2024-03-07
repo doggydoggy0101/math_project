@@ -28,10 +28,10 @@ class check:
         lambda_2_inv = 1/(vec[0] + norm*np.tan(self.theta))
 
         x_1 = lambda_1_inv*np.sin(self.theta)**2+lambda_2_inv*np.cos(self.theta)**2
-
         if norm == 0:
-            x_2 = np.zeros(len(vec[1:]))
-            x_2[0] = 1
+            w = np.zeros(len(vec[1:]))
+            w[0] = 1
+            x_2 = (lambda_2_inv-lambda_1_inv)*(np.sin(self.theta)*np.cos(self.theta))*w
         else:
             x_2 = (lambda_2_inv-lambda_1_inv)*(np.sin(self.theta)*np.cos(self.theta))*(vec[1:]/norm)
 
@@ -45,7 +45,7 @@ class check:
 
     def checkSOC(self, vec):
         ''' check if a vector is in second order cone '''
-        if vec[0] + 1e-7 >= np.linalg.norm(vec[1:]):
+        if vec[0] + 1e-7 >= np.linalg.norm(vec[1:])*(1/np.tan(self.theta)):
             return True
         else:
             # print(vec[0] - np.linalg.norm(vec[1:]))

@@ -28,9 +28,10 @@ class CircularCone3D:
         return x.ravel(), y.ravel(), z.ravel() # vectorize
 
     def makeCone(self, x,y,z):
+        ''' returns the interior of circular cone '''
         Lx,Ly,Lz = [],[],[]
         for i in range(self.num**2*(self.num//2)):
-            if z[i] >= np.linalg.norm([x[i],y[i]])*(1/np.tan(self.theta)):
+            if z[i] - np.linalg.norm([x[i],y[i]])*(1/np.tan(self.theta)) > 1e-7:
                 Lx.append(x[i])
                 Ly.append(y[i])
                 Lz.append(z[i])
@@ -42,10 +43,14 @@ class CircularCone3D:
         fig = plt.figure( figsize=(6,5), dpi=120)
         ax = plt.axes(projection='3d')
 
-        ax.scatter3D(self.x, self.y, self.z, s=size, c=color)
         if points is not None:
-            for p in points: 
-                ax.scatter3D(p[0], p[1], p[2], s=5, c='r')
+            ax.scatter3D(self.x, self.y, self.z, s=1, c=color, alpha=0.2)
+            if len(points.shape) == 1:
+                ax.scatter3D(points[0], points[1], points[2], s=size, c='r')
+            else:
+                ax.scatter3D(points[:,0], points[:,1], points[:,2], s=size, c='r')
+        else:
+            ax.scatter3D(self.x, self.y, self.z, s=size, c=color)
 
         ax.set_xlim(-self.bdd, self.bdd)
         ax.set_ylim(-self.bdd, self.bdd)
