@@ -10,6 +10,9 @@ class check_AH:
         self.verbose = verbose
 
         if self.verbose:
+            print("vector 1:", self.vec1)
+            print("vector 2:", self.vec2)
+            print("-"*50)
             self.check_circular(self.vec1, "vector 1")
             self.check_circular(self.vec2, "vector 2")
 
@@ -58,8 +61,8 @@ class check_AH:
             return True
         else:
             if self.verbose:
-                print(name, "is not in circular cone with theta {} deg".format(np.round(self.theta*(180/np.pi),2)))
                 print("-"*50)
+                print(name, "is not in circular cone with theta {} deg".format(np.round(self.theta*(180/np.pi),2)))
                 print("x1=", vec[0])
                 print("||x2||=", np.linalg.norm(vec[1:]))
                 print("x1 < ||x2||")
