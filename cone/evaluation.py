@@ -1,14 +1,21 @@
 import numpy as np
 
-class check:
+class check_AH:
     ''' check A - H is in second order cone '''
-    def __init__(self, vec_1, vec_2, theta):
+    def __init__(self, vec_1, vec_2, theta, verbose=False):
         ''' input vector has to be array '''
         self.vec1 = vec_1
         self.vec2 = vec_2
         self.theta = theta
+        self.verbose = verbose
 
-        self.bool = self.checkSOC(self.A() - self.H())
+        if self.verbose:
+            self.check_circular(self.vec1, "vector 1")
+            self.check_circular(self.vec2, "vector 2")
+
+        self.A = self.A_mean()
+        self.H = self.H_mean()
+        self.bool = self.check_circular(self.A - self.H, "A-H")
 
     def spec(self, vec):
         ''' spectral decomposition (not used) '''
@@ -37,16 +44,57 @@ class check:
 
         return np.insert(x_2, 0, x_1, axis=0)
 
-    def A(self):
+    def A_mean(self):
         return (self.vec1 + self.vec2)/2
 
-    def H(self):
+    def H_mean(self):
         return self.spec_inv((self.spec_inv(self.vec1) + self.spec_inv(self.vec2))/2)
 
-    def checkSOC(self, vec):
-        ''' check if a vector is in second order cone '''
+    def check_circular(self, vec, name=None):
+        ''' check if a vector is in circular cone '''
         if vec[0] + 1e-7 >= np.linalg.norm(vec[1:])*(1/np.tan(self.theta)):
+            if self.verbose:
+                print(name, "is in circular cone with theta {} deg".format(np.round(self.theta*(180/np.pi),2)))
             return True
         else:
-            # print(vec[0] - np.linalg.norm(vec[1:]))
+            if self.verbose:
+                print(name, "is not in circular cone with theta {} deg".format(np.round(self.theta*(180/np.pi),2)))
+                print("-"*50)
+                print("x1=", vec[0])
+                print("||x2||=", np.linalg.norm(vec[1:]))
+                print("x1 < ||x2||")
             return False
+
+class check:
+    ''' check if all points satisfies function check_AH '''
+    def __init__(self, vec, theta, verbose=False):
+
+        print("circular cone with angle {} deg".format(np.round(theta*(180/np.pi),2)))
+        print("checking...")
+
+        self.vec = vec
+        self.theta = theta
+        self.verbose = verbose
+
+        self.n = self.vec.shape[0] # number of points in cone
+        self.false_idx = self.run()
+
+        if len(self.false_idx) == 0:
+            print("Certified!")
+        else:
+            print("Not certified.")
+
+    def run(self):
+        point_idx = []
+        for i in range(self.n):
+            for j in range(i, self.n):
+                vec_1 = self.vec[i]
+                vec_2 = self.vec[j]
+                if check_AH(vec_1, vec_2, self.theta).bool:
+                    pass
+                else:
+                    if self.verbose:
+                        print("found case not in SOC")
+                        print(i,j)
+                    point_idx.append([i,j])
+        return point_idx

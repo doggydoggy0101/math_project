@@ -38,20 +38,32 @@ class CircularCone3D:
         
         return np.array(Lx), np.array(Ly), np.array(Lz)
         
-    def plotCone(self, points=None, size=2, color="#2980B9"):
+    def plotCone(self, size=2, color="#2980B9"):
         
         fig = plt.figure( figsize=(6,5), dpi=120)
         ax = plt.axes(projection='3d')
+        ax.scatter3D(self.x, self.y, self.z, s=size, c=color)
 
-        if points is not None:
-            ax.scatter3D(self.x, self.y, self.z, s=1, c=color, alpha=0.2)
-            if len(points.shape) == 1:
-                ax.scatter3D(points[0], points[1], points[2], s=size, c='r')
-            else:
-                ax.scatter3D(points[:,0], points[:,1], points[:,2], s=size, c='r')
+        ax.set_xlim(-self.bdd, self.bdd)
+        ax.set_ylim(-self.bdd, self.bdd)
+        ax.set_zlim(0, self.bdd)
+        ax.set_xlabel("x")
+        ax.set_ylabel("y")
+        ax.set_zlabel("z")
+        ax.set_title("Circular Cone: " + r"$(z,x,y)\in\mathbb{R}\times\mathbb{R}^2$")
+        plt.show()
+
+    def plotPoint(self, points, size=2, color="#2980B9"):
+
+        fig = plt.figure( figsize=(6,5), dpi=120)
+        ax = plt.axes(projection='3d')
+        ax.scatter3D(self.x, self.y, self.z, s=1, c=color, alpha=0.2)
+
+        if len(points.shape) == 1:
+            ax.scatter3D(points[0], points[1], points[2], s=size, c='r')
         else:
-            ax.scatter3D(self.x, self.y, self.z, s=size, c=color)
-
+            ax.scatter3D(points[:,0], points[:,1], points[:,2], s=size, c='r')
+            
         ax.set_xlim(-self.bdd, self.bdd)
         ax.set_ylim(-self.bdd, self.bdd)
         ax.set_zlim(0, self.bdd)
