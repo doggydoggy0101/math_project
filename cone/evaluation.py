@@ -18,6 +18,13 @@ class check_AH:
 
         self.A = self.A_mean()
         self.H = self.H_mean()
+        if self.verbose:
+            print("-"*50)
+            self.check_circular(self.A, "A")
+            self.check_circular(self.H, "H")
+
+        if self.verbose:
+            print("-"*50)
         self.bool = self.check_circular(self.A - self.H, "A-H")
 
     def spec(self, vec):
@@ -51,7 +58,12 @@ class check_AH:
         return (self.vec1 + self.vec2)/2
 
     def H_mean(self):
-        return self.spec_inv((self.spec_inv(self.vec1) + self.spec_inv(self.vec2))/2)
+        self.vec1_inv = self.spec_inv(self.vec1)
+        self.vec2_inv = self.spec_inv(self.vec2)
+        if self.verbose:
+            self.check_circular(self.vec1_inv, "inverse of vector 1")
+            self.check_circular(self.vec2_inv, "inverse of vector 2")
+        return self.spec_inv((self.vec1_inv + self.vec2_inv)/2)
 
     def check_circular(self, vec, name=None):
         ''' check if a vector is in circular cone '''
@@ -61,11 +73,10 @@ class check_AH:
             return True
         else:
             if self.verbose:
-                print("-"*50)
                 print(name, "is not in circular cone with theta {} deg".format(np.round(self.theta*(180/np.pi),2)))
-                print("x1=", vec[0])
-                print("||x2||=", np.linalg.norm(vec[1:]))
-                print("x1 < ||x2||")
+                print("    x1=", vec[0])
+                print("    ||x2||=", np.linalg.norm(vec[1:]))
+                print("    x1 < ||x2||")
             return False
 
 class check:
