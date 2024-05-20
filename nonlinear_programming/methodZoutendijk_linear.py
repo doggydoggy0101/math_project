@@ -1,14 +1,17 @@
 import numpy as np
 import cvxpy as cp
 class linearZoutendijk:
-    def __init__(self, initial):
+    def __init__(self, initial, max_iter=1000, verbose=False):
+        self.max_iter = max_iter
+        self.verbose = verbose
+
         self.quad = np.array([[2, -1], [-1, 2]])
         self.linear =  np.array([-4, -6])
         self.coef = [{"A_linear" : np.array([1, 1]), "b" : 2}, 
                      {"A_linear" : np.array([1, 5]), "b" : 5},
                      {"A_linear" : np.array([-1, 0]), "b" : 0},
                      {"A_linear" : np.array([0, -1]), "b" : 0}]
-        self.run(np.array(initial))
+        self.run(initial)
 
     def objective(self, x):
         return x@self.quad@x + self.linear@x
@@ -32,9 +35,9 @@ class linearZoutendijk:
         return l_max
 
     def run(self, x):
-        ''' CVXPY '''
-        for iteration in range(1000):
-            print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
+        for iteration in range(self.max_iter):
+            if self.verbose:
+                print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
             A1, A2, b2 = [], [], []
             for i in range(len(self.coef)):
                 val, bind = self.constraint(x, i)
@@ -53,7 +56,8 @@ class linearZoutendijk:
             prob = cp.Problem(cp.Minimize(np.array(self.derivative(x)).T@d), constraints)
             prob.solve()
             d = d.value
-            print("direction:", d)
+            if self.verbose:
+                print("direction:", d)
 
             # stopping criteria
             if np.round(self.derivative(x)@d, 7) == 0:
@@ -66,25 +70,25 @@ class linearZoutendijk:
             prob = cp.Problem(cp.Minimize((d@self.quad@d)*l**2 + (2*d@self.quad@x + self.linear@d)*l), constraints)
             prob.solve()
             l = l.value
-            print("lambda:", l)
+            if self.verbose:
+                print("lambda:", l)
 
             x = x + l*d
-            print("x:", x)
+            if self.verbose:
+                print("x:", x)
 
-        print("-"*10 + " result " + "-"*10)
-        print("optimal solution:", x)
-        print("optimal value:", self.objective(x))
+        self.optimal_sol = x
+        self.optimal_val = self.objective(self.optimal_sol)
+
+        if self.verbose:
+            print("-"*10 + " result " + "-"*10)
+            print("optimal solution:", self.optimal_sol)
+            print("optimal value:", self.optimal_val)
 
 
 
+if __name__ == "__main__":
 
-from fractions import Fraction
-np.set_printoptions(formatter={'all':lambda x: str(Fraction(x).limit_denominator())})
-
-def main():
-    ''' Example 10.1.5 '''
     initial_point = np.array([0.0, 0.0])
 
-    linearZoutendijk(initial=initial_point)
-
-main()
+    linearZoutendijk(initial=initial_point, verbose=True)
