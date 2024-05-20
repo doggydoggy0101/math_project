@@ -20,9 +20,8 @@ class nonlinearZoutendijk:
     def derivative(self, x):
         return 2*self.quad@x + self.linear
 
-    def constraint(self, x, index):
-        val = x@self.coef[index]["g_quad"]@x + self.coef[index]["g_linear"]@x + self.coef[index]["g_const"]
-        return val, np.round(val, 7) == 0
+    def binding(self, x, index):
+        return np.round(x@self.coef[index]["g_quad"]@x + self.coef[index]["g_linear"]@x + self.coef[index]["g_const"], 7) == 0
 
     def lambda_max(self, x, d):
         l_max = cp.Variable(1)
@@ -43,7 +42,7 @@ class nonlinearZoutendijk:
                 print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
             g_i = []
             for i in range(len(self.coef)):
-                val, bind = self.constraint(x, i)
+                bind = self.binding(x, i)
                 if bind:
                     g_i.append(self.coef[i])
 

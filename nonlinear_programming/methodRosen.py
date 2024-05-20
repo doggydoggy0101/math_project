@@ -1,7 +1,7 @@
 import numpy as np
 import cvxpy as cp
 
-class linearZoutendijk:
+class gradientProjection:
     def __init__(self, initial, max_iter=1000, verbose=False):
         self.max_iter = max_iter
         self.verbose = verbose
@@ -35,6 +35,7 @@ class linearZoutendijk:
         return l_max
 
     def run(self, x):
+        stop = False
         for iteration in range(self.max_iter):
             if self.verbose:
                 print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
@@ -47,21 +48,41 @@ class linearZoutendijk:
                     A2.append(self.coef[i]["A_linear"])
                     b2.append(self.coef[i]["b"])
 
-            # linear programming
-            d = cp.Variable(2)
-            constraints = [np.array(A1)@d <= np.zeros(2)]
-            for i in range(2):
-                constraints += [-1 <= d[i]]
-                constraints += [d[i] <= 1]
-            prob = cp.Problem(cp.Minimize(np.array(self.derivative(x)).T@d), constraints)
-            prob.solve()
-            d = d.value
-            if self.verbose:
-                print("direction:", d)
+            M = np.zeros((len(A1), 2))
+            for i in range(len(A1)):
+                M[i,:] = A1[i]
 
-            # stopping criteria
-            if np.round(self.derivative(x)@d, 7) == 0:
-                break
+            while True:
+                if len(M) == 0:
+                    if np.round(np.linalg.norm(self.derivative(x)), 7) == 0:
+                        stop = True
+                        break # stopping criteria
+                    else:
+                        d = -self.derivative(x)
+                        break # break while
+                
+                P = np.eye(2) - M.T@np.linalg.inv(M@M.T)@M
+
+                d = -P@self.derivative(x)
+                if self.verbose:
+                    print("direction:", d)
+
+                if np.round(self.derivative(x)@d, 7) == 0:
+
+                    u = -np.linalg.inv(M@M.T)@M@self.derivative(x)
+                    if all(u_i >= 0 for u_i in u):
+                        stop = True
+                        break # stopping criteria
+                    else:
+                        for i, u_i in enumerate(u):
+                            if u_i < 0:
+                                M = np.delete(M, i, axis=0)
+                                break # break while
+                        continue
+                else:
+                    break # break while
+            if stop:
+                break # break loop  
 
             # line search
             l = cp.Variable(1)
@@ -86,9 +107,8 @@ class linearZoutendijk:
             print("optimal value:", self.optimal_val)
 
 
-
 if __name__ == "__main__":
 
     initial_point = np.array([0.0, 0.0])
 
-    linearZoutendijk(initial=initial_point, verbose=True)
+    gradientProjection(initial=initial_point, verbose=True)

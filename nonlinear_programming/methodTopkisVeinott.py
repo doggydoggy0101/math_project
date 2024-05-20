@@ -20,10 +20,6 @@ class nonlinearTopkisVeinott:
     def derivative(self, x):
         return 2*self.quad@x + self.linear
 
-    def constraint(self, x, index):
-        val = x@self.coef[index]["g_quad"]@x + self.coef[index]["g_linear"]@x + self.coef[index]["g_const"]
-        return val, np.round(val, 7) == 0
-
     def lambda_max(self, x, d):
         l_max = cp.Variable(1)
         constraints = [l_max >= 0]

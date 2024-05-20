@@ -2,8 +2,7 @@ import numpy as np
 import cvxpy as cp
 
 class penaltySuccessiveLP:
-    def __init__(self, initial, delta, max_iter=1000, verbose=False):
-        self.max_iter = max_iter
+    def __init__(self, initial, delta, verbose=False):
         self.verbose = verbose
 
         self.mu = 10
@@ -31,8 +30,9 @@ class penaltySuccessiveLP:
 
 
     def linear_programming(self, x, delta):
+
         d, y = cp.Variable(2), cp.Variable(1)
-        obj = (2*self.f_quad@x + self.f_linear)@d + self.mu*y
+
         constraints = [y >= 0]
         constraints += [y >= x@self.g_quad@x + self.g_linear@x + (2*self.g_quad@x + self.g_linear)@d]
         for i in range(len(self.coef)):
@@ -40,9 +40,11 @@ class penaltySuccessiveLP:
         for i in range(2):
             constraints += [-delta[i] <= d[i]]
             constraints += [d[i] <= delta[i]]
-        prob = cp.Problem(cp.Minimize(obj), constraints)
+
+        prob = cp.Problem(cp.Minimize((2*self.f_quad@x + self.f_linear)@d + self.mu*y), constraints)
         prob.solve()
         d = d.value
+
         return d
 
     def trust_region(self, ratio, delta):
@@ -67,9 +69,10 @@ class penaltySuccessiveLP:
         self.r2 = 0.75
         self.beta = 0.5
 
+        iteration = 0
         if self.verbose:
-            print("-"*10 + " iteration 1" + "-"*10)
-        for iteration in range(self.max_iter):
+            print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
+        while True:
             if self.verbose:
                 print("solving with trust-region {}".format(delta))
 
@@ -97,8 +100,12 @@ class penaltySuccessiveLP:
             if self.verbose:
                 print("ratio:", ratio)
             check, delta = self.trust_region(ratio, delta)
+
             if check:
+                
                 x = x + d
+
+                iteration += 1
                 if self.verbose:
                     print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
                     
@@ -108,6 +115,5 @@ if __name__ == "__main__":
     
     initial_point = np.array([0.0, 1.0])
     initial_bound = np.array([1.0, 1.0])
-    max_iteration = 1000
 
-    penaltySuccessiveLP(initial=initial_point, delta=initial_bound, max_iter=max_iteration, verbose=True)
+    penaltySuccessiveLP(initial=initial_point, delta=initial_bound, verbose=True)
