@@ -80,9 +80,9 @@ class gradientProjection:
                                 break # break while
                         continue
                 else:
-                    break # break while
+                    break 
             if stop:
-                break # break loop  
+                break 
 
             # line search
             l = cp.Variable(1)
@@ -105,6 +105,8 @@ class gradientProjection:
             print("-"*10 + " result " + "-"*10)
             print("optimal solution:", self.optimal_sol)
             print("optimal value:", self.optimal_val)
+
+
 
 
 if __name__ == "__main__":

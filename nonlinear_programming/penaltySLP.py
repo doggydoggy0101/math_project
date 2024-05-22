@@ -28,7 +28,6 @@ class penaltySuccessiveLP:
     def linear_approx(self, x, d):
         return x@self.f_quad@x + self.f_linear@x + (2*self.f_quad@x + self.f_linear)@d + self.mu*max(0, x@self.g_quad@x + self.g_linear@x + (2*self.g_quad@x + self.g_linear)@d)
 
-
     def linear_programming(self, x, delta):
 
         d, y = cp.Variable(2), cp.Variable(1)
@@ -61,7 +60,6 @@ class penaltySuccessiveLP:
                 delta /= self.beta
             return True, delta
 
-
     def run(self, x, delta):
 
         self.r0 = 1e-6
@@ -80,19 +78,13 @@ class penaltySuccessiveLP:
             d = self.linear_programming(x, delta)
             if self.verbose:
                 print("direction:", d)
-                print("x:", x)
+                print("x:", x + d)
 
             delta_penalty = self.linear_penalty(x) - self.linear_penalty(x + d)
             delta_approx = self.linear_approx(x, np.zeros(len(x))) - self.linear_approx(x, d) 
 
             # stopping criteria
             if np.round(delta_approx, 7) == 0:
-                self.optimal_sol = x
-                self.optimal_val = self.objective(self.optimal_sol)
-                if self.verbose:
-                    print("-"*10 + " result " + "-"*10)
-                    print("optimal solution:", self.optimal_sol)
-                    print("optimal value:", self.optimal_val)
                 break
 
             # trust-region
@@ -108,7 +100,15 @@ class penaltySuccessiveLP:
                 iteration += 1
                 if self.verbose:
                     print("-"*10 + " iteration {} ".format(iteration+1) + "-"*10)
+
+        self.optimal_sol = x
+        self.optimal_val = self.objective(self.optimal_sol)
+        if self.verbose:
+            print("-"*10 + " result " + "-"*10)
+            print("optimal solution:", self.optimal_sol)
+            print("optimal value:", self.optimal_val)
                     
+
 
 
 if __name__ == "__main__":

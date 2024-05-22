@@ -90,9 +90,10 @@ class nonlinearZoutendijk:
 
 
 
+
 if __name__ == "__main__":
     
     initial_point = np.array([0.0, 0.75])
-    max_iteration = 6
+    max_iteration = 10
 
     nonlinearZoutendijk(initial=initial_point, max_iter=max_iteration, verbose=True)

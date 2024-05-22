@@ -87,6 +87,7 @@ class linearZoutendijk:
 
 
 
+
 if __name__ == "__main__":
 
     initial_point = np.array([0.0, 0.0])

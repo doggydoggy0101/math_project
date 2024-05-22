@@ -54,7 +54,7 @@ class nonlinearTopkisVeinott:
                 print("direction:", d)
 
             # stopping criteria
-            if np.round(z, 7) == 0:
+            if np.round(z, 4) == 0:
                 break
 
             # line search
@@ -82,9 +82,10 @@ class nonlinearTopkisVeinott:
 
 
 
+
 if __name__ == "__main__":
     
     initial_point = np.array([0.0, 0.75])
-    max_iteration = 5
+    max_iteration = 20
 
     nonlinearTopkisVeinott(initial=initial_point, max_iter=max_iteration, verbose=True)
