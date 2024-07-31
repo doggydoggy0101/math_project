@@ -19,8 +19,8 @@ pcd2 = data.pcd2point.copy()
 
 
 # initial guess
-init_X = np.eye(3) # for notation simplicity
-# init_X = R.random(random_state=2).as_matrix()
+# init_X = np.eye(3) # for notation simplicity
+init_X = R.random(random_state=2).as_matrix()
 x = mat_to_vec(init_X)
 
 

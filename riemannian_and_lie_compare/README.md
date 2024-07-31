@@ -1,0 +1,1 @@
+Numercial examples of blog: [Riemannian and Lie theory comparison](https://doggydoggy0101.github.io/post/riemannian_lie_compare/).
