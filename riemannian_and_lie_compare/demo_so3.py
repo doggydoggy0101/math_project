@@ -3,11 +3,12 @@ from scipy.spatial.transform import Rotation as R
 
 from utils.data import createToyData
 from utils.so3 import mat_to_vec, vec_to_mat, hat, projection
-from utils.utils import compute_M
+from utils.utils import compute_M_so3
 
 num_points = 1
 if num_points == 1:
-    pcd = np.random.rand(3)
+    pcd = np.array([1.0, 2.0, 3.0])
+    # pcd = np.random.rand(3)
 else:
     pcd = np.random.rand(num_points, 3)
 
@@ -19,13 +20,13 @@ pcd2 = data.pcd2point.copy()
 
 
 # initial guess
-# init_X = np.eye(3) # for notation simplicity
-init_X = R.random(random_state=2).as_matrix()
+init_X = np.eye(3) # for notation simplicity
+# init_X = R.random(random_state=2).as_matrix()
 x = mat_to_vec(init_X)
 
 
 # Riemannian approach
-mat_m = compute_M(pcd1, pcd2)
+mat_m = compute_M_so3(pcd1, pcd2)
 gradEuclidean = 2*mat_m@x
 gradEuclidean = vec_to_mat(gradEuclidean)
 gradByRiemannian = projection(gradEuclidean, init_X)
@@ -43,6 +44,3 @@ else:
 gradLie = hat(lievec)
 gradByLie = init_X@gradLie
 print("\ngradient defined by Lie theory:\n", gradByLie)
-
-# comparison
-print("\nratio:\n", gradByLie/gradByRiemannian)
