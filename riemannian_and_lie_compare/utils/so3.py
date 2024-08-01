@@ -16,4 +16,4 @@ def hat(vec):
                      [-vec[1], vec[0], 0]])
 
 def projection(mat, so3):
-    return so3@((so3.T@mat - mat.T@so3)/2)
+    return so3@(so3.T@mat - mat.T@so3) # omit division by 2 to match Lie theory
