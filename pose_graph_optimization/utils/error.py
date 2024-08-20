@@ -1,0 +1,28 @@
+import numpy as np
+from utils.LieTheory import se2_hat, se2_vee
+
+def compute_error(graph):
+
+    err = 0
+    for edge in graph.edges:
+        # compute idx for nodes using lookup table
+        fromIdx = graph.lut[edge.fromNode]
+        toIdx = graph.lut[edge.toNode]
+
+        if edge.Type == 'P': 
+            pose_i = se2_hat(graph.x[fromIdx:fromIdx + 3]) # stored as (x, y, theta)
+            pose_j = se2_hat(graph.x[toIdx:toIdx + 3]) # stored as (x, y, theta)
+       
+            relpose = np.linalg.inv(pose_i)@pose_j # relative pose 
+            gtruth = se2_hat(edge.measurement) # ground truth, stored as (x, y, theta)
+            err += np.linalg.norm(se2_vee(np.linalg.inv(gtruth)@relpose))
+
+        elif edge.Type == 'L': 
+            pose = se2_hat(graph.x[fromIdx:fromIdx + 3]) # stored as (x, y, theta)
+            landmark = graph.x[toIdx:toIdx + 2]
+
+            relmeas = np.linalg.inv(pose)[:2, :2]@np.expand_dims(landmark, axis=1) # relative measurement
+            gtruth = np.expand_dims(edge.measurement, axis=1) # ground truth, homogeneous coordinate
+            err += np.linalg.norm(relmeas - gtruth)
+
+    return err

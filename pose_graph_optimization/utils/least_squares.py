@@ -1,0 +1,139 @@
+# Implementation of 
+# [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
+#     A tutorial on graph-based SLAM. 
+#     IEEE Intelligent Transportation Systems Magazine, 2(4), 31-43.
+# [2] Sola, J., Deray, J., & Atchuthan, D. (2018). 
+#     A micro Lie theory for state estimation in robotics. 
+#     arXiv preprint arXiv:1812.01537.
+
+import numpy as np
+from scipy.sparse import csr_matrix
+from scipy.sparse.linalg import spsolve
+
+from utils.LieTheory import se2_hat, se2_Log
+
+
+def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType):
+    ''' [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
+            A tutorial on graph-based SLAM. 
+            IEEE Intelligent Transportation Systems Magazine, 2(4), 31-43.
+        [2] Sola, J., Deray, J., & Atchuthan, D. (2018). 
+            A micro Lie theory for state estimation in robotics. 
+            arXiv preprint arXiv:1812.01537. '''
+    if edgeType == "P":
+
+        pose_i = node1
+        pose_j = node2
+        # x,y
+        t_i = pose_i[:2].reshape(2, 1)
+        t_j = pose_j[:2].reshape(2, 1)
+        t_ij = gtruth[:2].reshape(2, 1)
+        # theta
+        theta_i = pose_i[2]
+        theta_j = pose_j[2]
+        theta_ij = gtruth[2]
+
+        rot_i = se2_hat(pose_i)[:2, :2]
+        rot_ij = se2_hat(gtruth)[:2, :2]
+
+        # derivative of rot_i with respect to theta_i
+        drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
+                           [np.cos(theta_i), -np.sin(theta_i)]])
+
+        # residual 
+        res = np.vstack((rot_ij.T@rot_i.T@(t_j - t_i) - rot_ij.T@t_ij, (theta_j - theta_i) - theta_ij))
+        # Jacobian of residual with respect to pose_i (Equation (32) of [1])
+        J_i = -np.eye(3)
+        J_i[:2, :2] = -rot_ij.T@rot_i.T
+        J_i[:2, 2] = rot_ij.T@drot_i.T@(t_j - t_i).ravel()
+        # Jacobian of residual with respect to pose_j (Equation (32) of [2])
+        J_j = np.eye(3)
+        J_j[:2, :2] = rot_ij.T@rot_i.T
+
+        return J_i, J_j, res
+
+    if edgeType == "L":
+
+        pose = node1
+        landmark = node2
+
+        # x,y
+        t_i = pose[:2].reshape(2, 1)
+        t_j = landmark.reshape(2, 1)
+        z_ij = gtruth.reshape(2, 1)
+        # theta
+        theta_i = pose[2]
+        rot_i = se2_hat(pose)[:2, :2]
+
+        # derivative of rot_i with respect to theta_i
+        drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
+                           [np.cos(theta_i), -np.sin(theta_i)]])
+        # residual
+        res = rot_i.T@(t_j - t_i) - z_ij
+        # Jacobian of residual with respect to pose_i
+        J_i = np.zeros((2, 3))
+        J_i[:2, :2] = -rot_i.T
+        J_i[:2, 2] = drot_i.T@(t_j - t_i).ravel()
+        # Jacobian of residual with respect to landmark_j 
+        J_j = rot_i.T
+        
+        return J_i, J_j, res
+
+
+def GaussNewton(graph):
+    ''' [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
+            A tutorial on graph-based SLAM. 
+            IEEE Intelligent Transportation Systems Magazine, 2(4), 31-43. '''
+    H = np.zeros((len(graph.x), len(graph.x)))
+    b = np.expand_dims(np.zeros(len(graph.x)), axis=1)
+
+    needToAddPrior = True
+
+    for edge in graph.edges:
+        # compute idx for nodes using lookup table
+        fromIdx = graph.lut[edge.fromNode]
+        toIdx = graph.lut[edge.toNode]
+
+        if edge.Type == 'P':
+            pose1 = graph.x[fromIdx:fromIdx + 3]
+            pose2 = graph.x[toIdx:toIdx + 3]
+
+            gtruth = edge.measurement
+            mat_info = edge.information
+            J_i, J_j, res = compute_Jacobian_and_residual(pose1, pose2, gtruth, edgeType=edge.Type)
+ 
+            # update H (Equation (18) in [1])
+            H[fromIdx:fromIdx+3, fromIdx:fromIdx+3] += J_i.T@mat_info@J_i
+            H[fromIdx:fromIdx+3, toIdx:toIdx+3] += J_i.T@mat_info@J_j
+            H[toIdx:toIdx+3, fromIdx:fromIdx+3] += J_j.T@mat_info@J_i
+            H[toIdx:toIdx+3, toIdx:toIdx+3] += J_j.T@mat_info@J_j
+            # update b (Equation (19) in [1])
+            b[fromIdx:fromIdx+3] += (J_i.T@mat_info@res).reshape(3, 1)
+            b[toIdx:toIdx+3] += (J_j.T@mat_info@res).reshape(3, 1)
+            # add prior for one pose of this edge
+            if needToAddPrior:
+                H[fromIdx:fromIdx + 3, fromIdx:fromIdx + 3] = H[fromIdx:fromIdx + 3, fromIdx:fromIdx + 3] + 1000 * np.eye(3)
+                needToAddPrior = False
+
+        elif edge.Type == 'L':
+            pose = graph.x[fromIdx:fromIdx+3]
+            landmark = graph.x[toIdx:toIdx+2]
+
+            gtruth = edge.measurement
+            mat_info = edge.information
+            J_i, J_j, res = compute_Jacobian_and_residual(pose, landmark, gtruth, edgeType=edge.Type)
+            
+            # update H (Equation (18) in [1])
+            H[fromIdx:fromIdx+3, fromIdx:fromIdx+3] += J_i.T@mat_info@J_i
+            H[fromIdx:fromIdx+3, toIdx:toIdx+2] += J_i.T@mat_info@J_j
+            H[toIdx:toIdx+2, fromIdx:fromIdx+3] += J_j.T@mat_info@J_i
+            H[toIdx:toIdx+2, toIdx:toIdx+2] += J_j.T@mat_info@J_j
+            # update b (Equation (19) in [1])
+            b[fromIdx:fromIdx+3] += (J_i.T@mat_info@res).reshape(3, 1)
+            b[toIdx:toIdx+2] += (J_j.T@mat_info@res).reshape(2, 1)
+       
+    # solve sparse linear system
+    H_sparse = csr_matrix(H)
+    dx = spsolve(H_sparse, -b).squeeze()
+
+    return dx
