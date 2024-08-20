@@ -1,10 +1,18 @@
 # some math projects
 
-* [ Numerical Analysis  ](#na)
-* [ Linear Programming ](#lp)
-* [ Matrix Computation](#mc)
-* [ Regression Analysis](#ra)
-* [ Scientific Computation](#sc)
+## Courses
+
+* [Numerical Analysis](#na)
+* [Linear Programming](#lp)
+* [Matrix Computation](#mc)
+* [Regression Analysis](#ra)
+* [Scientific Computation](#sc)
+
+## Others
+ 
+* [Robotics](#ro)
+
+
 
 <a name="na"></a>
 ### Numerical Analysis 
@@ -51,6 +59,10 @@
 * matrix factorization (SVD, alternating-LS)
 * page rank
 * ADMM
+
+
+<a name="ro"></a>
+### Robotics
 
 
 
