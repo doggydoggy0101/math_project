@@ -10,10 +10,10 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import spsolve
 
-from utils.LieTheory import se2_hat, se2_Log
+from utils.LieTheory import se2_hat, se2_Log, se2_Jacobian_right, se2_Jacobian_inversion
+### TODO: Jacobian by Lie theory
 
-
-def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType):
+def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
     ''' [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
             A tutorial on graph-based SLAM. 
             IEEE Intelligent Transportation Systems Magazine, 2(4), 31-43.
@@ -80,7 +80,7 @@ def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType):
         return J_i, J_j, res
 
 
-def GaussNewton(graph):
+def GaussNewton(graph, gradType="Euclidean"):
     ''' [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
             A tutorial on graph-based SLAM. 
             IEEE Intelligent Transportation Systems Magazine, 2(4), 31-43. '''
@@ -91,46 +91,46 @@ def GaussNewton(graph):
 
     for edge in graph.edges:
         # compute idx for nodes using lookup table
-        fromIdx = graph.lut[edge.fromNode]
-        toIdx = graph.lut[edge.toNode]
+        i = graph.lut[edge.fromNode]
+        j = graph.lut[edge.toNode]
 
         if edge.Type == 'P':
-            pose1 = graph.x[fromIdx:fromIdx + 3]
-            pose2 = graph.x[toIdx:toIdx + 3]
+            pose1 = graph.x[i:i+3]
+            pose2 = graph.x[j:j+3]
 
             gtruth = edge.measurement
             mat_info = edge.information
-            J_i, J_j, res = compute_Jacobian_and_residual(pose1, pose2, gtruth, edgeType=edge.Type)
+            J_i, J_j, res = compute_Jacobian_and_residual(pose1, pose2, gtruth, edgeType=edge.Type, gradType=gradType)
  
             # update H (Equation (18) in [1])
-            H[fromIdx:fromIdx+3, fromIdx:fromIdx+3] += J_i.T@mat_info@J_i
-            H[fromIdx:fromIdx+3, toIdx:toIdx+3] += J_i.T@mat_info@J_j
-            H[toIdx:toIdx+3, fromIdx:fromIdx+3] += J_j.T@mat_info@J_i
-            H[toIdx:toIdx+3, toIdx:toIdx+3] += J_j.T@mat_info@J_j
+            H[i:i+3, i:i+3] += J_i.T@mat_info@J_i
+            H[i:i+3, j:j+3] += J_i.T@mat_info@J_j
+            H[j:j+3, i:i+3] += J_j.T@mat_info@J_i
+            H[j:j+3, j:j+3] += J_j.T@mat_info@J_j
             # update b (Equation (19) in [1])
-            b[fromIdx:fromIdx+3] += (J_i.T@mat_info@res).reshape(3, 1)
-            b[toIdx:toIdx+3] += (J_j.T@mat_info@res).reshape(3, 1)
+            b[i:i+3] += (J_i.T@mat_info@res).reshape(3, 1)
+            b[j:j+3] += (J_j.T@mat_info@res).reshape(3, 1)
             # add prior for one pose of this edge
             if needToAddPrior:
-                H[fromIdx:fromIdx + 3, fromIdx:fromIdx + 3] = H[fromIdx:fromIdx + 3, fromIdx:fromIdx + 3] + 1000 * np.eye(3)
+                H[i:i+3, i:i+3] = H[i:i+3, i:i+3] + 1000 * np.eye(3)
                 needToAddPrior = False
 
         elif edge.Type == 'L':
-            pose = graph.x[fromIdx:fromIdx+3]
-            landmark = graph.x[toIdx:toIdx+2]
+            pose = graph.x[i:i+3]
+            landmark = graph.x[j:j+2]
 
             gtruth = edge.measurement
             mat_info = edge.information
-            J_i, J_j, res = compute_Jacobian_and_residual(pose, landmark, gtruth, edgeType=edge.Type)
+            J_i, J_j, res = compute_Jacobian_and_residual(pose, landmark, gtruth, edgeType=edge.Type, gradType=gradType)
             
             # update H (Equation (18) in [1])
-            H[fromIdx:fromIdx+3, fromIdx:fromIdx+3] += J_i.T@mat_info@J_i
-            H[fromIdx:fromIdx+3, toIdx:toIdx+2] += J_i.T@mat_info@J_j
-            H[toIdx:toIdx+2, fromIdx:fromIdx+3] += J_j.T@mat_info@J_i
-            H[toIdx:toIdx+2, toIdx:toIdx+2] += J_j.T@mat_info@J_j
+            H[i:i+3, i:i+3] += J_i.T@mat_info@J_i
+            H[i:i+3, j:j+2] += J_i.T@mat_info@J_j
+            H[j:j+2, i:i+3] += J_j.T@mat_info@J_i
+            H[j:j+2, j:j+2] += J_j.T@mat_info@J_j
             # update b (Equation (19) in [1])
-            b[fromIdx:fromIdx+3] += (J_i.T@mat_info@res).reshape(3, 1)
-            b[toIdx:toIdx+2] += (J_j.T@mat_info@res).reshape(2, 1)
+            b[i:i+3] += (J_i.T@mat_info@res).reshape(3, 1)
+            b[j:j+2] += (J_j.T@mat_info@res).reshape(2, 1)
        
     # solve sparse linear system
     H_sparse = csr_matrix(H)

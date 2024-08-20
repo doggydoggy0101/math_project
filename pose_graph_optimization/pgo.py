@@ -17,8 +17,6 @@ def pose_graph_optimization(graph, max_iteration=1000, tolerance=1e-4):
         graph.x += dX
         err = compute_error(graph)
         print("iter {} error: {}".format(i+1, err))
-
-        print(np.abs(norm_dX - norm_prev))
             
         # stopping criteria
         if i >= 1 and np.abs(norm_dX - norm_prev) < tolerance:
@@ -32,10 +30,10 @@ def pose_graph_optimization(graph, max_iteration=1000, tolerance=1e-4):
 
 
 dataset = "intel" # pose constraint only (tol=0.01, 32 iters)
-dataset = "dlr" # pose constraint & landmark constraint (tol=0.1, iter=25)
+# dataset = "dlr" # pose constraint & landmark constraint (tol=0.1, iter=25)
 
 graph = read_graph_g2o("data/" + dataset + ".g2o")
 plot_graph(graph, dataset + "_init")
 
-graph = pose_graph_optimization(graph, max_iteration=1000, tolerance=0.1)
+graph = pose_graph_optimization(graph, max_iteration=100, tolerance=0.01)
 plot_graph(graph, dataset + "_optimized", constraint=False)

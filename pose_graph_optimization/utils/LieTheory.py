@@ -35,6 +35,27 @@ def se2_Log(mat):
 
     return lie
 
+def se2_Jacobian_right(lie):
+    x = lie[0]
+    y = lie[1]
+    theta = lie[2]
 
+    J_r = np.eye(3)
+    J_r[0, 0] = np.sin(theta)/theta
+    J_r[0, 1] = (1 - np.cos(theta))/theta
+    J_r[1, 0] = (np.cos(theta) - 1)/theta
+    J_r[1, 1] = np.sin(theta)/theta
+    J_r[0, 2] = (theta*x - y -np.sin(theta)*x + np.cos(theta)*y)/(theta**2)
+    J_r[1, 2] = (x + theta*y -np.cos(theta)*x - np.sin(theta)*y)/(theta**2)
 
+    return J_r
 
+def se2_Jacobian_inversion(se2):
+    rot  = se2[:2, :2]
+    t = se2[:2, 2]
+
+    J_inv = -np.eye(3)
+    J_inv[:2, :2] = -rot
+    J_inv[:2, 2] = so2_hat(1)@t
+
+    return J_inv
