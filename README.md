@@ -25,36 +25,36 @@ Feel free to check it out!
 <a name="nm"></a>
 ### Numercial methods
 
->  1. [Gradient descent & Newton's method](https://doggydoggy0101.github.io/post/gradient_descent_and_newton_method/)
-> 2. [Gauss-Newton](https://doggydoggy0101.github.io/post/gauss_newton/)
+* [Gradient descent & Newton's method](https://doggydoggy0101.github.io/post/gradient_descent_and_newton_method/)
+* [Gauss-Newton](https://doggydoggy0101.github.io/post/gauss_newton/)
 
 <a name="ml"></a>
 ### Machine learning
 
-> 1. [Support vector machine](https://doggydoggy0101.github.io/post/svm/)
+* [Support vector machine](https://doggydoggy0101.github.io/post/svm/)
 
 <a name="op"></a>
 ### Optimization
 
-> 1. [Linear program](https://doggydoggy0101.github.io/post/linear_programming/)
-> 2. [Semidefinite program](https://doggydoggy0101.github.io/post/semidefinite_programming/)
-> 3. [Quadratic program](https://doggydoggy0101.github.io/post/quadratic_programming/)
-> 4. [QP closed-form](https://doggydoggy0101.github.io/post/closed_form_qp/)
-> 5. [QCQP to SOCP](https://doggydoggy0101.github.io/post/qp_to_cqp/)
-> 6. [QCQP to SDP](https://doggydoggy0101.github.io/post/qcqp_to_sdp/)
+* [Linear program](https://doggydoggy0101.github.io/post/linear_programming/)
+* [Semidefinite program](https://doggydoggy0101.github.io/post/semidefinite_programming/)
+* [Quadratic program](https://doggydoggy0101.github.io/post/quadratic_programming/)
+* [QP closed-form](https://doggydoggy0101.github.io/post/closed_form_qp/)
+* [QCQP to SOCP](https://doggydoggy0101.github.io/post/qp_to_cqp/)
+* [QCQP to SDP](https://doggydoggy0101.github.io/post/qcqp_to_sdp/)
 
 <a name="ro"></a>
 ### Robotics
 
-> 1. [Point cloud registration](https://doggydoggy0101.github.io/post/point_cloud_registration/)
-> 2. [Motion planning](https://doggydoggy0101.github.io/post/motion_planning/)
-> 3. [Lie theory in robotics](https://doggydoggy0101.github.io/post/lie_theory_in_robotics/)
-> 4. [Riemannian and Lie theory comparison](https://doggydoggy0101.github.io/post/riemannian_lie_compare/)
+* [Point cloud registration](https://doggydoggy0101.github.io/post/point_cloud_registration/)
+* [Motion planning](https://doggydoggy0101.github.io/post/motion_planning/)
+* [Lie theory in robotics](https://doggydoggy0101.github.io/post/lie_theory_in_robotics/)
+* [Riemannian and Lie theory comparison](https://doggydoggy0101.github.io/post/riemannian_lie_compare/)
 
 <a name="cv"></a>
 ### Computer vision
 
-> 1. [Uncertainty in computer vision](https://doggydoggy0101.github.io/post/uncertainty_in_computer_vision/)
+* [Uncertainty in computer vision](https://doggydoggy0101.github.io/post/uncertainty_in_computer_vision/)
 
 
 
