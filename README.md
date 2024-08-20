@@ -1,5 +1,7 @@
 # some math projects
 
+Sample code of my [blogs](https://doggydoggy0101.github.io/home/) and assignments. I write blogs mainly about optimization and robotics. Feel free to check it out!
+
 ## Courses
 
 * [Numerical Analysis](#na)
