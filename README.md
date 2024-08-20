@@ -1,7 +1,14 @@
-# some math projects
-
 Sample code of my [blogs](https://doggydoggy0101.github.io/home/) and assignments. I write blogs mosty about *optimization* and *robotics*. 
+
 Feel free to check it out!
+
+
+## Blogs
+* [Numerical Methods](#nm)
+* [Optimization](#op)
+* [Robotics](#ro)
+* [Computer Vision](#cv)
+
 
 ## Courses
 
@@ -11,9 +18,44 @@ Feel free to check it out!
 * [Regression Analysis](#ra)
 * [Scientific Computation](#sc)
 
-## Others
- 
-* [Robotics](#ro)
+
+
+
+
+<a name="nm"></a>
+### Numercial methods
+
+>  1. [Gradient descent & Newton's method](https://doggydoggy0101.github.io/post/gradient_descent_and_newton_method/)
+> 2. [Gauss-Newton](https://doggydoggy0101.github.io/post/gauss_newton/)
+
+<a name="ml"></a>
+### Machine learning
+
+> 1. [Support vector machine](https://doggydoggy0101.github.io/post/svm/)
+
+<a name="op"></a>
+### Optimization
+
+> 1. [Linear program](https://doggydoggy0101.github.io/post/linear_programming/)
+> 2. [Semidefinite program](https://doggydoggy0101.github.io/post/semidefinite_programming/)
+> 3. [Quadratic program](https://doggydoggy0101.github.io/post/quadratic_programming/)
+> 4. [QP closed-form](https://doggydoggy0101.github.io/post/closed_form_qp/)
+> 5. [QCQP to SOCP](https://doggydoggy0101.github.io/post/qp_to_cqp/)
+> 6. [QCQP to SDP](https://doggydoggy0101.github.io/post/qcqp_to_sdp/)
+
+<a name="ro"></a>
+### Robotics
+
+> 1. [Point cloud registration](https://doggydoggy0101.github.io/post/point_cloud_registration/)
+> 2. [Motion planning](https://doggydoggy0101.github.io/post/motion_planning/)
+> 3. [Lie theory in robotics](https://doggydoggy0101.github.io/post/lie_theory_in_robotics/)
+> 4. [Riemannian and Lie theory comparison](https://doggydoggy0101.github.io/post/riemannian_lie_compare/)
+
+<a name="cv"></a>
+### Computer vision
+
+> 1. [Uncertainty in computer vision](https://doggydoggy0101.github.io/post/uncertainty_in_computer_vision/)
+
 
 
 
@@ -62,10 +104,3 @@ Feel free to check it out!
 * matrix factorization (SVD, alternating-LS)
 * page rank
 * ADMM
-
-
-<a name="ro"></a>
-### Robotics
-
-* [point cloud registration](https://github.com/doggydoggy0101/math_project/tree/main/point_cloud_registration)
-* [pose graph optimization](https://github.com/doggydoggy0101/math_project/tree/main/pose_graph_optimization)
