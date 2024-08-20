@@ -63,6 +63,9 @@ ENV/
 env.bak/
 venv.bak/
 
+#
+.DS_Store
+
 # Others
 #   registration
 point_cloud_registration/plot.py
