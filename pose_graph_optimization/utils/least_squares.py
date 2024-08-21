@@ -40,7 +40,7 @@ def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
 
             # derivative of rot_i with respect to theta_i
             drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
-                            [np.cos(theta_i), -np.sin(theta_i)]])
+                               [np.cos(theta_i), -np.sin(theta_i)]])
 
             # residual 
             res = np.hstack((rot_ij.T@rot_i.T@(t_j - t_i) - rot_ij.T@t_ij, (theta_j - theta_i) - theta_ij))
@@ -88,7 +88,7 @@ def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
         
         if gradType == "Lie":
             ### TODO write pose & landmark constraint residual
-            ### TODO dirive Jacobians respectively
+            ### TODO derive Jacobians respectively
             pass
         
         return J_i, J_j, res

@@ -1,4 +1,4 @@
-Numercial examples of blog: [Pose graph optimizationn](https://doggydoggy0101.github.io/post/pose_graph_optimization/).
+<!-- Numercial examples of blog: [Pose graph optimizationn](https://doggydoggy0101.github.io/post/pose_graph_optimization/). -->
 
 ### Datasets
 
