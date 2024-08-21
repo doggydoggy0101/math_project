@@ -5,7 +5,7 @@ Define the Jacobians in `least_squares.py`.
 
 - pose $X\_i=\begin{pmatrix}R\_i&t\_i\\\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t\_{i}, \theta\_{i})\in\mathbb{R}^3$
 - pose $X_\j=\begin{pmatrix}R\_j&t\_j\\\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t\_{j}, \theta\_{j})\in\mathbb{R}^3$
-- ground truth $\hat{X}_{ij}=\begin{pmatrix}\hat{R}&\hat{t}\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(\hat{t}_{ij}, \hat{\theta}_{ij})\in\mathbb{R}^3$
+- ground truth $\hat{X}\_{ij}=\begin{pmatrix}\hat{R}\_{ij}&\hat{t}\_{ij}\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(\hat{t}\_{ij}, \hat{\theta}\_{ij})\in\mathbb{R}^3$
 
 ### Euclidean approach
 
