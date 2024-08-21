@@ -6,13 +6,13 @@ from utils.error import compute_error
 from utils.least_squares import GaussNewton
 
 
-def pose_graph_optimization(graph, max_iteration=1000, tolerance=1e-4):
+def pose_graph_optimization(graph, max_iteration=1000, tolerance=1e-4, gradType="Euclidean"):
 
     norm_prev = 1e+10
     for i in range(max_iteration):
 
         # compute increment
-        dX = GaussNewton(graph)
+        dX = GaussNewton(graph, gradType=gradType)
         norm_dX = np.linalg.norm(dX)
         graph.x += dX
         err = compute_error(graph)

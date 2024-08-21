@@ -10,8 +10,8 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse.linalg import spsolve
 
-from utils.LieTheory import se2_hat, se2_Log, se2_Jacobian_right, se2_Jacobian_inversion
-### TODO: Jacobian by Lie theory
+from utils.LieTheory import se2_vec_to_mat, se2_Log, se2_Jacobian_right, se2_Jacobian_inversion
+### TODO Jacobian by Lie theory is not working
 
 def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
     ''' [1] Grisetti, G., Kümmerle, R., Stachniss, C., & Burgard, W. (2010). 
@@ -24,31 +24,39 @@ def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
 
         pose_i = node1
         pose_j = node2
-        # x,y
-        t_i = pose_i[:2].reshape(2, 1)
-        t_j = pose_j[:2].reshape(2, 1)
-        t_ij = gtruth[:2].reshape(2, 1)
-        # theta
-        theta_i = pose_i[2]
-        theta_j = pose_j[2]
-        theta_ij = gtruth[2]
 
-        rot_i = se2_hat(pose_i)[:2, :2]
-        rot_ij = se2_hat(gtruth)[:2, :2]
+        if gradType == "Euclidean":
+            # x,y
+            t_i = pose_i[:2]
+            t_j = pose_j[:2]
+            t_ij = gtruth[:2]
+            # theta
+            theta_i = pose_i[2]
+            theta_j = pose_j[2]
+            theta_ij = gtruth[2]
 
-        # derivative of rot_i with respect to theta_i
-        drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
-                           [np.cos(theta_i), -np.sin(theta_i)]])
+            rot_i = se2_vec_to_mat(pose_i)[:2, :2]
+            rot_ij = se2_vec_to_mat(gtruth)[:2, :2]
 
-        # residual 
-        res = np.vstack((rot_ij.T@rot_i.T@(t_j - t_i) - rot_ij.T@t_ij, (theta_j - theta_i) - theta_ij))
-        # Jacobian of residual with respect to pose_i (Equation (32) of [1])
-        J_i = -np.eye(3)
-        J_i[:2, :2] = -rot_ij.T@rot_i.T
-        J_i[:2, 2] = rot_ij.T@drot_i.T@(t_j - t_i).ravel()
-        # Jacobian of residual with respect to pose_j (Equation (32) of [2])
-        J_j = np.eye(3)
-        J_j[:2, :2] = rot_ij.T@rot_i.T
+            # derivative of rot_i with respect to theta_i
+            drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
+                            [np.cos(theta_i), -np.sin(theta_i)]])
+
+            # residual 
+            res = np.hstack((rot_ij.T@rot_i.T@(t_j - t_i) - rot_ij.T@t_ij, (theta_j - theta_i) - theta_ij))
+            # Jacobian of residual with respect to pose_i (Equation (32) of [1])
+            J_i = -np.eye(3)
+            J_i[:2, :2] = -rot_ij.T@rot_i.T
+            J_i[:2, 2] = rot_ij.T@drot_i.T@(t_j - t_i)
+            # Jacobian of residual with respect to pose_j (Equation (32) of [2])
+            J_j = np.eye(3)
+            J_j[:2, :2] = rot_ij.T@rot_i.T
+        
+        if gradType == "Lie":
+            ### TODO debug
+            res = se2_Log(np.linalg.inv(se2_vec_to_mat(gtruth))@np.linalg.inv(se2_vec_to_mat(pose_i))@se2_vec_to_mat(pose_j))
+            J_j = np.linalg.inv(se2_Jacobian_right(res))
+            J_i = J_j@se2_Jacobian_inversion(np.linalg.inv(se2_vec_to_mat(pose_i))@se2_vec_to_mat(pose_j))
 
         return J_i, J_j, res
 
@@ -57,25 +65,31 @@ def compute_Jacobian_and_residual(node1, node2, gtruth, edgeType, gradType):
         pose = node1
         landmark = node2
 
-        # x,y
-        t_i = pose[:2].reshape(2, 1)
-        t_j = landmark.reshape(2, 1)
-        z_ij = gtruth.reshape(2, 1)
-        # theta
-        theta_i = pose[2]
-        rot_i = se2_hat(pose)[:2, :2]
+        if gradType == "Euclidean":
+            # x,y
+            t_i = pose[:2]
+            t_j = landmark
+            z_ij = gtruth
+            # theta
+            theta_i = pose[2]
+            rot_i = se2_vec_to_mat(pose)[:2, :2]
 
-        # derivative of rot_i with respect to theta_i
-        drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
-                           [np.cos(theta_i), -np.sin(theta_i)]])
-        # residual
-        res = rot_i.T@(t_j - t_i) - z_ij
-        # Jacobian of residual with respect to pose_i
-        J_i = np.zeros((2, 3))
-        J_i[:2, :2] = -rot_i.T
-        J_i[:2, 2] = drot_i.T@(t_j - t_i).ravel()
-        # Jacobian of residual with respect to landmark_j 
-        J_j = rot_i.T
+            # derivative of rot_i with respect to theta_i
+            drot_i = np.array([[-np.sin(theta_i), -np.cos(theta_i)],
+                            [np.cos(theta_i), -np.sin(theta_i)]])
+            # residual
+            res = rot_i.T@(t_j - t_i) - z_ij
+            # Jacobian of residual with respect to pose_i
+            J_i = np.zeros((2, 3))
+            J_i[:2, :2] = -rot_i.T
+            J_i[:2, 2] = drot_i.T@(t_j - t_i)
+            # Jacobian of residual with respect to landmark_j 
+            J_j = rot_i.T
+        
+        if gradType == "Lie":
+            ### TODO write pose & landmark constraint residual
+            ### TODO dirive Jacobians respectively
+            pass
         
         return J_i, J_j, res
 

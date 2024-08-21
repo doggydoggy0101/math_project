@@ -1,5 +1,5 @@
 import numpy as np
-from utils.LieTheory import se2_hat, se2_vee
+from utils.LieTheory import se2_vec_to_mat, se2_mat_to_vec
 
 def compute_error(graph):
 
@@ -10,15 +10,15 @@ def compute_error(graph):
         j = graph.lut[edge.toNode]
 
         if edge.Type == 'P': 
-            pose_i = se2_hat(graph.x[i:i+3]) # stored as (x, y, theta)
-            pose_j = se2_hat(graph.x[j:j+3]) # stored as (x, y, theta)
+            pose_i = se2_vec_to_mat(graph.x[i:i+3]) # stored as (x, y, theta)
+            pose_j = se2_vec_to_mat(graph.x[j:j+3]) # stored as (x, y, theta)
        
             relpose = np.linalg.inv(pose_i)@pose_j # relative pose 
-            gtruth = se2_hat(edge.measurement) # ground truth, stored as (x, y, theta)
-            err += np.linalg.norm(se2_vee(np.linalg.inv(gtruth)@relpose))
+            gtruth = se2_vec_to_mat(edge.measurement) # ground truth, stored as (x, y, theta)
+            err += np.linalg.norm(se2_mat_to_vec(np.linalg.inv(gtruth)@relpose))
 
         elif edge.Type == 'L': 
-            pose = se2_hat(graph.x[i:i+3]) # stored as (x, y, theta)
+            pose = se2_vec_to_mat(graph.x[i:i+3]) # stored as (x, y, theta)
             landmark = graph.x[j:j+2]
 
             relmeas = np.linalg.inv(pose)[:2, :2]@np.expand_dims(landmark, axis=1) # relative measurement

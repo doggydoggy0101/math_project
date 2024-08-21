@@ -4,7 +4,7 @@
 #     arXiv preprint arXiv:1812.01537.
 import numpy as np
 
-def se2_vee(mat):
+def se2_mat_to_vec(mat):
     ''' SE(2) to (x, y, theta) '''
     x = mat[0, 2]
     y = mat[1, 2]
@@ -12,7 +12,7 @@ def se2_vee(mat):
     vec = np.array([x, y, theta])
     return vec
 
-def se2_hat(vec):
+def se2_vec_to_mat(vec):
     ''' (x, y, theta) to SE(2) '''
     theta = vec[2]
     mat = np.array([[np.cos(theta), -np.sin(theta), vec[0]], [np.sin(theta), np.cos(theta), vec[1]], [0.0, 0.0, 1.0]])
