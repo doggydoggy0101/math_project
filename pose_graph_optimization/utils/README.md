@@ -3,16 +3,16 @@ Define the Jacobians in `least_squares.py`.
 
 ## pose-pose constraint
 
-- pose $X\_i=\begin{pmatrix}R\_i&t\_i\\\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t\_{i}, \theta\_{i})\in\mathbb{R}^3$
-- pose $X_\j=\begin{pmatrix}R\_j&t\_j\\\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t\_{j}, \theta\_{j})\in\mathbb{R}^3$
-- ground truth $\hat{X}\_{ij}=\begin{pmatrix}\hat{R}\_{ij}&\hat{t}\_{ij}\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(\hat{t}\_{ij}, \hat{\theta}\_{ij})\in\mathbb{R}^3$
+- pose $X_i=\begin{pmatrix}R_i&t_i\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t_{i}, \theta_{i})\in\mathbb{R}^3$
+- pose $X_j=\begin{pmatrix}R_j&t_j\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(t_{j}, \theta_{j})\in\mathbb{R}^3$
+- ground truth $\hat{X}_{ij}=\begin{pmatrix}\hat{R}_{ij}&\hat{t}_{ij}\\0^\top&1\end{pmatrix}\in\text{SE}(2)$, vectorized as $(\hat{t}_{ij}, \hat{\theta}_{ij})\in\mathbb{R}^3$
 
 ### Euclidean approach
 
 residual function, [[1]](#GKS10) Equation (30)
 $$
 f:\text{SE}(2)\times\text{SE}(2)\to\mathbb{R}^3\ ;\ \ 
-f(X\_i,X\_j)=\begin{pmatrix}\hat{R}_{ij}^\top(R_i^\top(t_j-t_i)-\hat{t}_{ij})\\(\theta_j-\theta_i)-\hat{\theta}_{ij}\end{pmatrix}
+f(X_i,X_j)=\begin{pmatrix}\hat{R}_{ij}^\top(R_i^\top(t_j-t_i)-\hat{t}_{ij})\\(\theta_j-\theta_i)-\hat{\theta}_{ij}\end{pmatrix}
 $$
 
 Jacobian with respective to vectorized $X_i$, [[1]](#GKS10) Equation (32)
