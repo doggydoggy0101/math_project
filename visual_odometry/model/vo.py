@@ -88,8 +88,7 @@ class VisualOdometry:
                 kp1, kp2 = self.filtered_keypoint(prev_keypoint, curr_keypoint, match_list)
                 rel_pose = self.epipolor_transformation(kp1, kp2, data.intrinsic, data.projection)
                 
-                # relative pose from previous pose to current pose
-                # the odometry model is P1=T@P2, we update absolute pose by P2=P1@inv(T)
+                # the odometry model is P1@T=P2, update absolute pose by P2=P1@inv(T)
                 abs_pose = abs_pose@np.linalg.inv(rel_pose)
 
                 self.pred_path.append((abs_pose[0, 3], abs_pose[2, 3]))
