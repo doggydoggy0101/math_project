@@ -69,8 +69,10 @@ venv.bak/
 **/**/.DS_Store
 
 # Others
-#   registration
+### registration
 point_cloud_registration/plot.py
 point_cloud_registration/docs/dataRegistration.csv
 point_cloud_registration/utils/visualize.py
 point_cloud_registration/utils/experiment.py
+### visual odometry
+data/
