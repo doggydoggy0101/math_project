@@ -15,6 +15,8 @@ class LoadKITTIdataset:
         self.projection, self.intrinsic = self.load_calib(calib_path)
         self.poses = self.load_poses(pose_path)
 
+        self.sequence = int(sequence)
+
     @staticmethod
     def load_images(file_path):
         """ Load monocular grayscale images. """

@@ -9,7 +9,7 @@ def plot_path(pred_path, gt_path, sequence):
     gt_path = np.array(gt_path)
     pred_path = np.array(pred_path)
 
-    save_path = "docs/{}".format(sequence)
+    save_path = "docs/{0:0=2d}".format(sequence)
 
     plt.figure()
     plt.plot([x for x in pred_path[:, 0]], [z for z in pred_path[:, 1]], c=cblue) 

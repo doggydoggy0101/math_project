@@ -4,6 +4,7 @@ from tqdm import tqdm
 
 from model.features import FeatureDetectingAndMatching
 from utils.utils import se3_from_rot_and_t
+from visualize.trajectory import plot_path
 
 class VisualOdometry:
 
@@ -70,10 +71,15 @@ class VisualOdometry:
         return se3_from_rot_and_t(rot, t)
 
 
-    def run(self, data):
-        
-        self.pred_path = []
-        self.gt_path = []
+    def run(self, data, plot_trajectory=True):
+
+        # log result
+        log_file = open("./result/{0:0=2d}.txt".format(data.sequence), "w")
+
+        # visualize path
+        if plot_trajectory:
+            pred_path = []
+            gt_path = []
 
         for i, gt_pose in enumerate(tqdm(data.poses, unit="pose", desc="Visual odometry")):
 
@@ -91,8 +97,18 @@ class VisualOdometry:
                 # the odometry model is P1@T=P2, update absolute pose by P2=P1@inv(T)
                 abs_pose = abs_pose@np.linalg.inv(rel_pose)
 
-                self.pred_path.append((abs_pose[0, 3], abs_pose[2, 3]))
-                self.gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
-            
+                if plot_trajectory: # (x, z)
+                    pred_path.append((abs_pose[0, 3], abs_pose[2, 3])) 
+                    gt_path.append((gt_pose[0, 3], gt_pose[2, 3]))
+
+            # log poses (format) i T00 T01 T02 T03 T10 T11 T12 T13 T20 T21 T22 T23 
+            vec_pose = abs_pose[:3, :4].flatten()
+            n = log_file.write(str(i) + ' ' + ' '.join(map(str, vec_pose)) + '\n')
+
             prev_keypoint = curr_keypoint
             prev_descriptor = curr_descriptor
+
+        log_file.close()
+
+        if plot_trajectory:
+            plot_path(pred_path, gt_path, data.sequence)

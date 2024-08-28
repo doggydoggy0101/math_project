@@ -1,11 +1,13 @@
+import argparse
+
 from utils.dataloader import LoadKITTIdataset
 from model.vo import VisualOdometry
-from visualize.trajectory import plot_path
+from utils.evaluate import EvalOdometry
 
-SEQUENCE="09"
+SEQUENCE="10"
 
 data = LoadKITTIdataset(data_path="data", sequence=SEQUENCE)
 model = VisualOdometry(detect_method="ORB", match_method="FLANN")
 model.run(data)
 
-plot_path(model.pred_path, model.gt_path, SEQUENCE)
+EvalOdometry().run(sequence=SEQUENCE, alignment="6dof")
