@@ -1,5 +1,3 @@
-import argparse
-
 from utils.dataloader import LoadKITTIdataset
 from model.vo import VisualOdometry
 from utils.evaluate import EvalOdometry
