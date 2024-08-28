@@ -13,7 +13,7 @@ class VisualOdometry:
         self.detecter = cv2_methods.detecter
         self.matcher = cv2_methods.mathcher
 
-    def filtered_keypoint(self, kp1, kp2, match_list, threshold=0.5):
+    def filtered_keypoint(self, kp1, kp2, match_list, threshold=0.7):
 
         good_match_list = []
         try:
