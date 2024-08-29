@@ -30,43 +30,47 @@ class VisualOdometry:
         return q1, q2
 
     def epipolor_transformation(self, kp1, kp2, intrinsic, projection):
-        essential, _ = cv2.findEssentialMat(kp1, kp2, intrinsic)
-        rot1, rot2, t = cv2.decomposeEssentialMat(essential)
+        # The transformation solved by essential matrix with OpenCV is by solving is x2@E@x1=0, however, 
+        # the essential matrix derived by P1@T=P2, where T is the relative pose, should be obtained by solving x1@E@x2=0.
+        # Therefore, we solve (x1@E@x2).T=x2@E.T@x1=0. Please refer to Standford CS231A lecture notes for more details.
+        essential, _ = cv2.findEssentialMat(kp1, kp2, intrinsic) 
+        rot1, rot2, t = cv2.decomposeEssentialMat(essential.T) # relative pose
         t = t.flatten()
         possible_sol = [[rot1, t], [rot1, -t], [rot2, t], [rot2, -t]]
 
         # determine solution and compute relative scale
         sum_of_pos_depth_list = []
-        relative_scale_list = []
+        rel_scale_list = []
         for rot, t in possible_sol:
-            # relative transformation matrix between first and second image
-            T = se3_from_rot_and_t(rot, t)
-            # projection matrix of second image
-            P = np.hstack((intrinsic, np.zeros((3, 1))))@T
+            # Assume the absolute pose of first image is identity, then the absolute pose of second image is T.
+            # Projection matrix of the first image is K@inv(I)=K, which is the camera's projection matrix.
+            # Projection matrix of the second image is K@inv(T).
+            T = se3_from_rot_and_t(rot, t) 
+            P = np.hstack((intrinsic, np.zeros((3, 1))))@np.linalg.inv(T) # extrinsic is the inverse of absolute pose
 
             # reconstruct points (could be used for mapping)
             homo_kp1 = cv2.triangulatePoints(projection, P, kp1.T, kp2.T) # (4, n)
-            homo_kp2 = T@homo_kp1 # (4, n)
+            homo_kp2 = np.linalg.inv(T)@homo_kp1 # P1@T=P2 implies T@p2=p1
             # de-homogenize
             dhomo_kp1 = (homo_kp1[:3, :]/homo_kp1[3, :]).T # (n, 3)
-            dhomo_kp2 = (homo_kp2[:3, :]/homo_kp2[3, :]).T # (n, 3)
+            dhomo_kp2 = (homo_kp2[:3, :]/homo_kp2[3, :]).T 
 
             # check which solution has the most positive depth (z-coordinate)
             sum_of_pos_depth = np.sum(dhomo_kp1[:, 2] > 0) + np.sum(dhomo_kp2[:, 2] > 0)
             sum_of_pos_depth_list.append(sum_of_pos_depth)
 
             # calculate relative scale by some edges between keypoints
-            relative_scale = []
+            rel_scale = []
             num_edges = dhomo_kp1.shape[0] - 1
             for i in range(num_edges):
                 edge1 = np.linalg.norm(dhomo_kp1[i+1] - dhomo_kp1[i])
                 edge2 = np.linalg.norm(dhomo_kp2[i+1] - dhomo_kp2[i])
                 if edge2 != 0.0:
-                    relative_scale.append(edge1/edge2)
-            relative_scale_list.append(sum(relative_scale)/len(relative_scale))
+                    rel_scale.append(edge1/edge2)
+            rel_scale_list.append(sum(rel_scale)/len(rel_scale))
 
         rot, t = possible_sol[np.argmax(sum_of_pos_depth_list)]
-        t *= relative_scale_list[np.argmax(sum_of_pos_depth_list)]
+        t *= rel_scale_list[np.argmax(sum_of_pos_depth_list)]
 
         return se3_from_rot_and_t(rot, t)
 
@@ -94,8 +98,8 @@ class VisualOdometry:
                 kp1, kp2 = self.filtered_keypoint(prev_keypoint, curr_keypoint, match_list)
                 rel_pose = self.epipolor_transformation(kp1, kp2, data.intrinsic, data.projection)
                 
-                # the odometry model is P1@T=P2, update absolute pose by P2=P1@inv(T)
-                abs_pose = abs_pose@np.linalg.inv(rel_pose)
+                # odometry 
+                abs_pose = abs_pose@rel_pose
 
                 if plot_trajectory: # (x, z)
                     pred_path.append((abs_pose[0, 3], abs_pose[2, 3])) 

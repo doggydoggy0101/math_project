@@ -2,7 +2,7 @@ from utils.dataloader import LoadKITTIdataset
 from model.vo import VisualOdometry
 from utils.evaluate import EvalOdometry
 
-SEQUENCE="10"
+SEQUENCE="09"
 
 data = LoadKITTIdataset(data_path="data", sequence=SEQUENCE)
 model = VisualOdometry(detect_method="ORB", match_method="FLANN")
