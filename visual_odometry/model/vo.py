@@ -30,11 +30,11 @@ class VisualOdometry:
         return q1, q2
 
     def epipolor_transformation(self, kp1, kp2, intrinsic, projection):
-        # The transformation solved by essential matrix with OpenCV is by solving is x2@E@x1=0, however, 
-        # the essential matrix derived by P1@T=P2, where T is the relative pose, should be obtained by solving x1@E@x2=0.
-        # Therefore, we solve (x1@E@x2).T=x2@E.T@x1=0. Please refer to Standford CS231A lecture notes for more details.
+        # The transformation solved by essential matrix with OpenCV is by solving x2@E@x1=0.
+        # The transformation solved by essential matrix derived by P1@T=P2 (T is the relative pose) is by solving x1@E@x2=0.
+        # Therefore, we solve (x1@E@x2).T=x2@E.T@x1=0. Refer to Standford CS231A lecture notes for more details.
         essential, _ = cv2.findEssentialMat(kp1, kp2, intrinsic) 
-        rot1, rot2, t = cv2.decomposeEssentialMat(essential.T) # relative pose
+        rot1, rot2, t = cv2.decomposeEssentialMat(essential.T) 
         t = t.flatten()
         possible_sol = [[rot1, t], [rot1, -t], [rot2, t], [rot2, -t]]
 
@@ -42,11 +42,12 @@ class VisualOdometry:
         sum_of_pos_depth_list = []
         rel_scale_list = []
         for rot, t in possible_sol:
-            # Assume the absolute pose of first image is identity, then the absolute pose of second image is T.
-            # Projection matrix of the first image is K@inv(I)=K, which is the camera's projection matrix.
-            # Projection matrix of the second image is K@inv(T).
+            # Assume that the absolute pose of first image is identity, then the absolute pose of second image is T.
+            # Note that the extrinsic matrix is the inverse of absoulute pose.
+            # Projection matrix of first image is K@inv(I)=K, which is the camera's projection matrix.
+            # Projection matrix of second image is K@inv(T).
             T = se3_from_rot_and_t(rot, t) 
-            P = np.hstack((intrinsic, np.zeros((3, 1))))@np.linalg.inv(T) # extrinsic is the inverse of absolute pose
+            P = np.hstack((intrinsic, np.zeros((3, 1))))@np.linalg.inv(T) 
 
             # reconstruct points (could be used for mapping)
             homo_kp1 = cv2.triangulatePoints(projection, P, kp1.T, kp2.T) # (4, n)
@@ -76,10 +77,8 @@ class VisualOdometry:
 
 
     def run(self, data, plot_trajectory=True):
-
         # log result
         log_file = open("./result/{0:0=2d}.txt".format(data.sequence), "w")
-
         # visualize path
         if plot_trajectory:
             pred_path = []
