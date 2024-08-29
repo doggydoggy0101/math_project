@@ -7,24 +7,33 @@ class LoadKITTIdataset:
 
     def __init__(self, data_path, sequence):
 
-        image_path = os.path.join(data_path, "sequences", sequence, "image_0")
-        calib_path = os.path.join(data_path, "sequences", sequence, "calib.txt")
-        pose_path = os.path.join(data_path, "poses", sequence+".txt")
+        self.image_path = os.path.join(data_path, "sequences", sequence, "image_0")
+        self.image_list = sorted(os.listdir(self.image_path))
+        self.frame_idx = list(range(len(self.image_list)))
 
-        self.images = self.load_images(image_path)
+        calib_path = os.path.join(data_path, "sequences", sequence, "calib.txt")
         self.projection, self.intrinsic = self.load_calib(calib_path)
+        
+        pose_path = os.path.join(data_path, "poses", sequence+".txt")
         self.poses = self.load_poses(pose_path)
 
         self.sequence = int(sequence)
 
-    @staticmethod
-    def load_images(file_path):
-        """ Load monocular grayscale images. """
-        image_list = []
-        for file in tqdm(sorted(os.listdir(file_path)), unit="image", desc="Loading images"):
-            image_path = os.path.join(file_path, file)
-            image_list.append(cv2.imread(image_path, cv2.IMREAD_GRAYSCALE))
-        return image_list
+    def __iter__(self):
+        self.idx = 0
+        return self
+
+    def __len__(self):
+        return len(self.image_list)
+
+    def __next__(self):
+        if self.idx == len(self.frame_idx):
+            raise StopIteration
+        idx = self.frame_idx[self.idx]
+        self.idx += 1
+
+        image_path = os.path.join(self.image_path, self.image_list[idx])
+        return cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
 
     @staticmethod
     def load_calib(file_path):

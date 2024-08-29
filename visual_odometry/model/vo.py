@@ -85,13 +85,15 @@ class VisualOdometry:
             pred_path = []
             gt_path = []
 
-        for i, gt_pose in enumerate(tqdm(data.poses, unit="pose", desc="Visual odometry")):
+        for i, image in enumerate(tqdm(data, unit="image", desc="Visual odometry")):
+
+            gt_pose = data.poses[i]
 
             if i == 0:
                 abs_pose = gt_pose
-                curr_keypoint, curr_descriptor = self.detecter.detectAndCompute(data.images[0], None)
+                curr_keypoint, curr_descriptor = self.detecter.detectAndCompute(image, None)
             else:
-                curr_keypoint, curr_descriptor = self.detecter.detectAndCompute(data.images[i], None)
+                curr_keypoint, curr_descriptor = self.detecter.detectAndCompute(image, None)
                 match_list = self.matcher.knnMatch(prev_descriptor, curr_descriptor, k=2)
                 match_list = sorted(match_list, key=lambda x:x[0].distance)
             
