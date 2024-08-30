@@ -2,7 +2,6 @@ import numpy as np
 from tqdm import tqdm
 
 from model.registration import FGRandICP
-
 from visualize.trajectory import plot_path
 
 class LaserOdometryAndMapping:

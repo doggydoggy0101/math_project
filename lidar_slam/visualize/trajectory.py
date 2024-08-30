@@ -15,7 +15,7 @@ def plot_path(pred_path, gt_path, sequence):
     plt.plot([x for x in pred_path[:, 0]], [z for z in pred_path[:, 1]], c=cblue) 
     plt.plot([x for x in gt_path[:, 0]], [z for z in gt_path[:, 1]], c=cred) 
     plt.grid()
-    plt.title("LO - Seq {}".format(sequence))
+    plt.title("LO - Seq {0:0=2d}".format(sequence))
     plt.xlabel("Translation in x direction [m]")
     plt.ylabel("Translation in z direction [m]")
     plt.legend(["estimated", "ground truth"]);

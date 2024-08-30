@@ -40,7 +40,7 @@ class FGRandICP:
         source = o3d.geometry.PointCloud()
         source.points = o3d.utility.Vector3dVector(pcd1)
         source.estimate_normals()
-
+        
         target = o3d.geometry.PointCloud()
         target.points = o3d.utility.Vector3dVector(pcd2)
         target.estimate_normals()
