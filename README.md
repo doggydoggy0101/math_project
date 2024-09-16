@@ -22,6 +22,7 @@ Feel free to check it out!
 
 ### Optimization
 
+* [Convex optimization preliminaries](https://doggydoggy0101.github.io/post/convex_optimization_preliminaries/)
 * [Linear program](https://doggydoggy0101.github.io/post/linear_programming/)
 * [Semidefinite program](https://doggydoggy0101.github.io/post/semidefinite_programming/)
 * [Quadratic program](https://doggydoggy0101.github.io/post/quadratic_programming/)
@@ -32,6 +33,7 @@ Feel free to check it out!
 ### Robotics
 
 * [Point cloud registration](https://doggydoggy0101.github.io/post/point_cloud_registration/)
+* [Pose graph optimization](https://doggydoggy0101.github.io/post/pose_graph_optimization/)
 * [Motion planning](https://doggydoggy0101.github.io/post/motion_planning/)
 * [Lie theory in robotics](https://doggydoggy0101.github.io/post/lie_theory_in_robotics/)
 * [Riemannian and Lie theory comparison](https://doggydoggy0101.github.io/post/riemannian_lie_compare/)
