@@ -6,9 +6,9 @@ from visualize.trajectory import plot_path
 
 class LaserOdometryAndMapping:
 
-    def __init__(self):
+    def __init__(self, voxel_size):
 
-        self.registration = FGRandICP()
+        self.registration = FGRandICP(voxel_size=voxel_size)
 
     def run(self, data, plot_trajectory=True):
 
@@ -32,12 +32,12 @@ class LaserOdometryAndMapping:
             else:
                 # registration
                 T = self.registration.run(pcd_previous[:, :3], pcd[:, :3])
-
-                #TODO lidar mapping
                 
                 # odometry 
                 rel_pose = Tr@np.linalg.inv(T)@np.linalg.inv(Tr)
                 abs_pose = abs_pose@rel_pose
+
+                #TODO lidar mapping
 
                 if plot_trajectory: # (x, z)
                     pred_path.append((abs_pose[0, 3], abs_pose[2, 3])) 
