@@ -2,25 +2,25 @@ import open3d as o3d
 
 class FGRandICP:
 
-    def __init__(self):
+    def __init__(self, voxel_size=1):
 
-        self.voxel_size = 1
+        self.voxel_size = voxel_size
 
     def preprocess_point_cloud(self, pcd):
         """ FPFH feature extraction. """
         pcd_down = pcd.voxel_down_sample(self.voxel_size)
-        radius_normal = self.voxel_size * 2
+        radius_normal = self.voxel_size*2
         pcd_down.estimate_normals(
             o3d.geometry.KDTreeSearchParamHybrid(radius=radius_normal, max_nn=30))
 
-        radius_feature = self.voxel_size * 5
+        radius_feature = self.voxel_size*5
         pcd_fpfh = o3d.pipelines.registration.compute_fpfh_feature(
             pcd_down,
             o3d.geometry.KDTreeSearchParamHybrid(radius=radius_feature, max_nn=100))
         return pcd_down, pcd_fpfh
 
     def fast_global_registration(self, source_down, target_down, source_fpfh, target_fpfh):
-        distance_threshold = self.voxel_size * 0.5
+        distance_threshold = self.voxel_size*0.5
         result = o3d.pipelines.registration.registration_fgr_based_on_feature_matching(
             source_down, target_down, source_fpfh, target_fpfh,
             o3d.pipelines.registration.FastGlobalRegistrationOption(
@@ -28,7 +28,7 @@ class FGRandICP:
         return result
 
     def refine_registration(self, source, target, initial):
-        distance_threshold = self.voxel_size * 0.4
+        distance_threshold = self.voxel_size*0.4
         result = o3d.pipelines.registration.registration_icp(
             source, target, distance_threshold, initial,
             o3d.pipelines.registration.TransformationEstimationPointToPlane())
