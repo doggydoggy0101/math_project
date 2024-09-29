@@ -44,12 +44,18 @@ class FGRandICP:
         target.points = o3d.utility.Vector3dVector(pcd2)
         target.estimate_normals()
 
-        # down sample & feature extraction
-        source_down, source_fpfh = self.preprocess_point_cloud(source)
-        target_down, target_fpfh = self.preprocess_point_cloud(target)
+        # down sample 
+        source_down = source.voxel_down_sample(self.voxel_size)
+        target_down = target.voxel_down_sample(self.voxel_size)
+        self.voxel_size = 2
+
+        # doubledown sample & feature extraction
+        source_ddown, source_fpfh = self.preprocess_point_cloud(source)
+        target_ddown, target_fpfh = self.preprocess_point_cloud(target)
+
         # global registration by FGR
-        result_fgr = self.fast_global_registration(source_down, target_down, source_fpfh, target_fpfh)
+        result_fgr = self.fast_global_registration(source_ddown, target_ddown, source_fpfh, target_fpfh)
         # local refinement by ICP
-        result_icp = self.refine_registration(source, target, initial=result_fgr.transformation)
+        result_icp = self.refine_registration(source_down, target_down, initial=result_fgr.transformation)
 
         return result_icp.transformation

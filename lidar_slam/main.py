@@ -2,7 +2,7 @@ from utils.dataloader import LoadKITTIdataset
 from model.loam import LaserOdometryAndMapping
 from utils.evaluate import EvalOdometry
 
-SEQUENCE="00"
+SEQUENCE="10"
 
 data = LoadKITTIdataset(data_path="data", sequence=SEQUENCE)
 model = LaserOdometryAndMapping(voxel_size=1)
