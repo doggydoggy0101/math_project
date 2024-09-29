@@ -48,8 +48,8 @@ def draw_axis(ax, dim=3):
         ax.quiver(0, 0, 0, 1, scale=4, width=0.004)
 
     if dim == 3:
-        ax.quiver(0, 0, 0, 1, 0, 0, length=1.2, lw=1, color="black")
-        ax.quiver(0, 0, 0, 0, 1, 0, length=1.2, lw=1, color="black")
+        ax.quiver(0, 0, 0, 1, 0, 0, length=1.2, lw=1, color="black", arrow_length_ratio=0.1)
+        ax.quiver(0, 0, 0, 0, 1, 0, length=1.2, lw=1, color="black", arrow_length_ratio=0.1)
 
 
 fig = plt.figure(figsize=(9, 12), dpi=240)
