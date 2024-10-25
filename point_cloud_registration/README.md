@@ -1,4 +1,4 @@
-# :fax: Point Cloud Registration
+# :robot: Point cloud registration
 
 Numercial examples of blog: [Point cloud registration](https://dgbshien.com/post/point_cloud_registration.html).
 

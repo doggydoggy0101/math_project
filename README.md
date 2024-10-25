@@ -5,6 +5,8 @@ Sample code of my [blogs](https://dgbshien.com/index.html#sec_blog) and assignme
 **Table of Contents**
 - [Some math projects](#some-math-projects)
   - [:computer: Blogs](#computer-blogs)
+    - [:robot: Robotics](#robot-robotics)
+    - [:minidisc: Other projects](#minidisc-other-projects)
   - [:school: Courses](#school-courses)
     - [:books: Numerical Analysis (Fall 2020), National Taiwan Normal University.](#books-numerical-analysis-fall-2020-national-taiwan-normal-university)
     - [:books: Linear Programming (Fall 2020), National Taiwan Normal University.](#books-linear-programming-fall-2020-national-taiwan-normal-university)
@@ -15,6 +17,18 @@ Sample code of my [blogs](https://dgbshien.com/index.html#sec_blog) and assignme
 
 
 ## :computer: Blogs
+
+### :robot: Robotics 
+- [Point cloud registration](point_cloud_registration)
+- [Pose graph optimization](pose_graph_optimization)
+- [Riemannian and Lie theory comparison](riemannian_and_lie_compare)
+
+### :minidisc: Other projects
+These projects are actually not blogs, but I don't know where to put them.
+
+- [Visual odometry](visual_odometry)
+- [Lidar Odometry and Mapping (LOAM)](lidar_slam)
+
 
 ## :school: Courses
 

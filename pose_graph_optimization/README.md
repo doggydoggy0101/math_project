@@ -26,4 +26,6 @@ Numercial examples of blog: [Pose graph optimization](https://dgbshien.com/post/
 python ./pgo.py
 ```
 
+
+
 > Error while implementing Lie derivative, not sure if the derivation is correct yet.
