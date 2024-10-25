@@ -1,5 +1,5 @@
-# :books: Linear programming
-Sample code of Linear programming (Fall 2020), National Taiwan Normal University. An introduction to linear program can be found [here](https://dgbshien.com/post/linear_programming.html).
+# :books: Linear Programming
+Sample code of Linear Programming (Fall 2020), National Taiwan Normal University. An introduction to linear program can be found [here](https://dgbshien.com/post/linear_programming.html).
 
 ### :notebook: Simplex method
 ```shell
